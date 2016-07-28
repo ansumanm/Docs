@@ -10,3 +10,26 @@ There are many protocols that can be used to clone.
 Ex. https,ssh
 ------------------------------------------------------------
 git clone https://github.com/ansumanm/Docs.git
+
+
+------------------------------------------------------------
+A typical workflow after /creating/editing a file
+------------------------------------------------------------
+1) Check the status of the repo
+git status  
+
+2) Add the files to be staged.
+git add git_cheatsheet.txt 
+
+3)Configure your Email address and name for a repo.
+Without this, commit is not possible. This needs to be done once.
+
+git config --global user.email "ansuman.mohanty@gmail.com"
+git config --global user.name "Ansuman Mohanty"
+
+4) Commit the changes to your local repo.
+git commit 
+
+5) Push the changes to the central repo.
+git push origin master # Push your changes to the central repo.
+
