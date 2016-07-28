@@ -33,3 +33,37 @@ git commit
 5) Push the changes to the central repo.
 git push origin master # Push your changes to the central repo.
 
+------------------------------------------------------------
+Working with remote repositories.
+------------------------------------------------------------
+$ git remote
+origin          # if we have cloned from a remote repo,
+	 	# it is set to default repo named origin
+
+$ git remote -v  # Shows the shortnames for the URLs
+origin	https://github.com/ansumanm/Docs.git (fetch)
+origin	https://github.com/ansumanm/Docs.git (push)
+
+$ git remote add <shortname> <url> # To add a remote repo explicitly.
+git remote add pb https://github.com/paulboone/ticgit
+
+$ git remote -v
+origin	https://github.com/ansumanm/Docs.git (fetch)
+origin	https://github.com/ansumanm/Docs.git (push)
+pb	https://github.com/paulboone/ticgit (fetch)
+pb	https://github.com/paulboone/ticgit (push)
+
+$ git fetch pb 	# Fetch command goes out to that remote project and 
+		# pulls all the data that you dont have in your project
+		# You can merge it or inspect it anytime after that.
+
+$ git fetch origin # Fetches any new work after you last cloned. It 
+			# only downloads the data. We need to merge it.
+
+# git pull origin # Will fetch the data and try to merge it also.
+
+$ git remote show pb # Inspect a remote.
+
+$ git remote rename pb paul # Rename a remote.
+
+$ git remote rm paul # Remote a remote.
