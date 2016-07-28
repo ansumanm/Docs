@@ -1,0 +1,12 @@
+------------------------------------------------------------
+Initialize a central repository on a server (ex. github.com)
+------------------------------------------------------------
+git init --bare /path/to/repo.git
+
+
+------------------------------------------------------------
+Clone a remote repository to your local space.
+There are many protocols that can be used to clone.
+Ex. https,ssh
+------------------------------------------------------------
+git clone https://github.com/ansumanm/Docs.git
