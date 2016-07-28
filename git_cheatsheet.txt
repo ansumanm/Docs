@@ -27,6 +27,25 @@ Without this, commit is not possible. This needs to be done once.
 git config --global user.email "ansuman.mohanty@gmail.com"
 git config --global user.name "Ansuman Mohanty"
 
+git config --global core.editor vim 	# Configure your Editor (optional).
+$ git config --list	# Check the configuration
+credential.helper=osxkeychain
+user.email=ansuman.mohanty@gmail.com
+user.name=Ansuman Mohanty
+core.repositoryformatversion=0
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+core.ignorecase=true
+core.precomposeunicode=true
+remote.origin.url=https://github.com/ansumanm/Docs.git
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+branch.master.remote=origin
+branch.master.merge=refs/heads/master
+remote.pb.url=https://github.com/paulboone/ticgit
+remote.pb.fetch=+refs/heads/*:refs/remotes/pb/*
+
+
 4) Commit the changes to your local repo.
 git commit 
 
