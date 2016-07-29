@@ -96,3 +96,23 @@ git submodule add https://github.com/scrooloose/nerdtree.git bundle/nerdtree
 git submodule add https://github.com/xolox/vim-misc bundle/vim-misc
 git submodule add https://github.com/benmills/vimux.git bundle/vimux
 git submodule add https://github.com/xolox/vim-notes.git bundle/vim-notes
+
+-------------------------------------------------------------
+git submodule workflow
+refer: http://blog.endpoint.com/2010/04/git-submodule-workflow.html
+-------------------------------------------------------------
+1) Add a new submodule
+git submodule add https://github.com/scrooloose/nerdtree.git bundle/nerdtree
+git submodule init
+
+2) Commit and push
+git commit
+git push origin master
+
+.gitmodules file has all the info about your submodules.
+
+3) When you clone your project from elsewhere,
+After cloning, issue the following commands:-
+git submodule init
+git submodule update
+
