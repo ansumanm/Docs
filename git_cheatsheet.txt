@@ -116,3 +116,33 @@ After cloning, issue the following commands:-
 git submodule init
 git submodule update
 
+
+
+-------------------------------------------------------------
+How do I integrate a submodule back into my project?
+Or, in other words, how do I un-submodule a git submodule?
+If all you want is to put your submodule code into the main
+repository, you just need to remove the submodule and re-add
+the files into the main repo:
+
+http://blogs.atlassian.com/2013/03/git-submodules-workflows-tips/
+-------------------------------------------------------------
+Delete the reference to the submodule from the index, but keep the files:
+
+$ git rm --cached submodule_path (no trailing slash)
+
+
+Delete the .gitmodules file or if you have more than one submodules
+edit this file removing the submodule from the list:
+
+$ git rm .gitmodules
+
+
+Remove the .git metadata folder (make sure you have backup of this):
+
+$ rm -rf submodule_path/.git
+
+Add the submodule to the main repository index:
+
+$ git add submodule_path
+$ git commit -m "remove submodule"
