@@ -1,0 +1,87 @@
+List of datastructures
+=======================
+1) Linked Lists
+	> Singly linked.
+	> Doubly Linked.
+	> Circular Linked.
+	> Memory-efficient doubly linked.
+	> Unrolled Linked List.
+	> Skip Lists.
+
+2) Stack
+3) Queues
+4) Trees
+	> Binary Trees
+	> Generic Trees
+	> Expression Trees
+	> XOR Trees
+	> Binary Search Trees (BSTs)
+	> Balanced Binary Search Trees
+	> AVL
+
+5) Priority Queue and Heaps
+	> Proirity Queue
+	> Heaps
+	> Binary Heap
+
+6) Graph
+	> Graph Representation
+	> Graph Traversals
+	> Topological Sort
+	> Shortest Path Algorithms
+	> Minimum spanning tree.
+
+7) Symbol Tables
+
+8) Datastructure for Strings
+	> Hash Tables
+	> Tries
+	> Ternary Search Trees
+	> Suffix Trees
+
+List of Algorithms
+===================
+1) Sorting Algorithms
+	> Bubble Sort
+	> Selection Sort
+	> Insertion Sort
+	> Shell Sort
+	> Merge Sort
+	> Heap Sort
+	> Quick Sort
+	> Tree Sort
+	> Counting Sort
+	> Bucket Sort
+	> Radix Sort
+	> Topological Sort
+	> External Sorting
+
+2) Searching Algoritms
+	> Unordered Linear Search
+	> Sorted/Ordered Linear Search
+	> Binary Search
+	> String Searching Algorithms.
+
+3) Selection Algorithms
+	> Selection by Sorting.
+	> Partition based Selection Algorithm.
+	> Linear Selection Algorithm -- Median of Medians Algorithm.
+
+4) Hashing
+	> Hash Table
+	> Hash Function
+	> Load Factor
+	> Collisions
+
+5) String Algorithms
+	> String Matching Algorithms
+	> Robin-Karp String Matching
+	> Finite Automata
+	> KMP Algorithm
+	> Boyce-Moore Algorithm
+
+6) Algorithm Design Techniques
+	> Greedy Algorithms.
+	> Divide and Conquer Algorithms.
+	> Dynamic Programming Algorithm.
+
