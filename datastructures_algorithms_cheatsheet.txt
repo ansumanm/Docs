@@ -85,3 +85,4 @@ List of Algorithms
 	> Divide and Conquer Algorithms.
 	> Dynamic Programming Algorithm.
 
+7) Recursion and backtracking.
