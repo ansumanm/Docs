@@ -146,3 +146,16 @@ Add the submodule to the main repository index:
 
 $ git add submodule_path
 $ git commit -m "remove submodule"
+
+
+
+-------------------------------------------------------------
+How to check if we need to pull from remote
+-------------------------------------------------------------
+1) git remote update # To bring your remote refs up to date.
+2) git status -uno # tell you whether the branch you are
+   # tracking is ahead, behind or has diverged.
+   # If it says nothing, the local and remote are the same.
+3) git show-branch *master #  will show you the commits in 
+   # all of the branches whose names end in 'master'
+4) git pull # To pull in the changes.
