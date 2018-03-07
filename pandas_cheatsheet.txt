@@ -1,0 +1,6 @@
+# Pandas usage
+import pandas as pd
+...
+
+# Print column names of a pandas dataframe 
+print(df.columns)
