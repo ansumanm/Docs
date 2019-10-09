@@ -1,0 +1,17 @@
+1) Functional Programming(Expression oriented programming):-
+=========================
+Avoid using explicit loops.
+-> lambda: Declare functions
+	lambda(x: x+1)
+-> map(function, list)
+	items = list(range(1,5))
+	items = list(map((lambda x: x+1), items))
+-> filter(function, list): Extracts elements of the list for which the function returns True.
+	items = list(filter((lambda x: x < 4), items))
+-> reduce(function, list): Considers all the elements in the list to produce a single result
+	from functools import reduce
+	items = reduce((lambda x,y: x/y), items)
+-> list comprehension: Build lists in a natural and simple way, referring to them in a manner
+	how mathematcians declare datasets.
+	s = [x**2 for x in range(5)]
+

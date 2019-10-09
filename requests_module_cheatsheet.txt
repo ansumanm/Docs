@@ -1,0 +1,191 @@
+Python Requests module cheatsheet:-
+====================================
+import requests
+
+1) Simple http request
+r = requests.get('http://www.google.com')
+
+2) Passing parameters to get request 
+
+parameters = {'key1':'value1', 'key2':'value2'}
+r = requests.get(url,params=parameters)
+
+3) Simple authentication
+
+r = requests.get('https://api.github.com/user', auth=('email@email.com', 'password'))
+r.status_code << 200
+r.url << u''
+r.request  <PreparedRequest GET>
+
+r) Response structure
+r.content << response content in raw string format
+r.text << Requests lib encodes r.content using r.encoding and returns the string value
+
+4) Custom Headers
+headers = {'Content-Type':'application/json'}
+r = requests.post(url, headers=headers)
+
+5) Sending form encode data
+payload = {'key1': 'value1', 'key2': 'value2'}
+r = requests.post("someurl/post", data=payload)
+
+6) Posting multipart encoded files
+We can upload multipart data like images and files using http POST.
+{'name': file-like-objects }
+or
+{'name': ('filename', fileobj)}
+
+url = 'some api endpoint'
+files = {'file': open('plan.csv', 'rb')}
+r = requests.post(url, files=files)
+
+7) Built in response status codes
+r = requests.get(url)
+r.status_code == requests.codes.ok << True
+
+8) Response.raise_for_status()
+r = requests.get('some bad url')
+r.raise_for_status()
+
+9) Response Headers:-
+r.headers.__dict__
+
+for key, value in r.__dict__.items():
+	print(key,':', value)
+
+10) Accessing cookies with requests
+r.cookies['some_cookie_name']
+
+11) Send our own cookies
+cookies = dict(cookies_are='working')
+r = requests.get(url, cookies=cookies)
+
+12) Tracking redirection of requests using requests history
+r = requests.get(url)
+r.url << Some other url
+r.history << [.]
+
+13) Disable redirects:-
+by setting allow_redirects=False
+
+r = requests.get(url, allow_redirects=False)
+
+13) Setting timeouts for requests
+r = requests.get(url, timeout=0.03)
+
+14) Errors and Exceptions
+HTTPError:
+ConnectionError:
+Timeout:
+TooManyRedirects:
+Missing Schema Exception
+Invalid-URL
+ChunkedEncodingError
+ContentDecodingError
+
+15) Sessions
+session = requests.Session()
+resp = session.get(url)
+session.params = {'key1': 'value1', 'key2': 'value2'}
+session.auth = ('usrname', 'password')
+session.headers.update({'foo': 'bar'})
+
+16) Request Object Parameters
+-> Method: GET/POST etc
+-> URL: Url to access
+-> headers: A dictionary of headers to be sent in request
+-> files: multipart upload
+-> data: Body attached to request.json (TODO: Need more info on this)
+-> params: A dictionry of URL parameters to be appended to URL
+-> auth: authentication to request
+-> cookies: A dictionary or a cookie jar of cookies
+-> hooks: A dictionary of callback hooks
+
+17) Prepared Requests
+The request attribute of response object is the prepared request
+Prepare request example:-
+
+from requests import Request, Session
+header = {}
+request = Request('get', url, headers=header)
+
+session = Session()
+prepare = session.prepare_request(request)
+response = session.send(prepare, stream=True, verify=True)
+
+methods: prepare, prepare_request, prepare_body, prepare_cookies, prepare_headers, prepare_hooks, prepare_method, prepare_url
+
+18) Verify an SSL certification
+verify=True
+
+r = requests.get(url, verify=True)
+
+19) Handling streaming data
+stream=True
+The connection remains open and only the headers are downloaded.
+This gives us the capability to fetch the content whenever we need by specifying conditions like data size.
+
+if int(request.headers['content_length']) < TOO_LONG:
+	content = r.content
+
+response.raw, responsed.data, iter_contect, iter_lines
+iter_content(chunk_size=size in bytes, decode_unicode=False)
+iter_lines(chunk_size = size in bytes, decode_unicode=None, delimitter=None)
+
+20) Streaming uploads
+with open('massive-body', 'rb') as file:
+    requests.post('http://example.com/some/stream/url',
+                  data=file)
+
+21) Using generator for sending chunk encoded requests
+def generator():
+	yield('Hello')
+	yield('World')
+
+requests.post(url, data=generator())
+
+22) Hooks
+response hook
+hooks = {hook_name: callback_function, ..}
+
+def print_attributes(request, *args, **kwargs):
+	print(request.url)
+	print(request.status_code)
+
+r = requests.get(url, hooks=dict(response=print_attributes))
+
+23) TODO: Iterating over streaming APIs
+24) TODO: Self-describing the APIs with link headers
+25) TODO: Transport Adapter
+
+26) Authenticating with requests
+1) Basic Authentication:- 
+a) If the requested header needs authentication, the server returns http-401 response
+containing a www-authenticate header.
+b) User sends another request with userid/password in the authorization header. The server grants access
+
+from requests.auth import HTTPBasicAuth
+requests.get(url, auth=HTTPBasicAuth('usr', 'pass'))
+Error code: 401 --unauthorized access
+Success: 200
+
+2) Http Digest Auth:-
+Next version of Basic Auth. credentials are encrypted using MD5
+
+from requests.auth import HTTPDigestAuth
+requests.get(url, auth=HTTPDigestAuth('user', 'pass'))
+
+3) TODO: Kerberos Authentication
+4) OAuth authentication:- a secure delegated access to user accounts on third party services like Google, Facebook.
+TODO: Go through details
+
+5) Custom Authentication:-
+requests.auth.AuthBase << Base class for all authentication types.
+
+import requests
+class CustomAuth(requests.auth.AuthBase):
+	def __call__(self, r):
+		# Custom Authentication Implementation
+		return r
+
+requests.get(url, auth=CustomAuth())

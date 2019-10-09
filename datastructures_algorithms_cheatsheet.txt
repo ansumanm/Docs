@@ -20,7 +20,7 @@ List of datastructures
 	> AVL
 
 5) Priority Queue and Heaps
-	> Proirity Queue
+	> Priority Queue
 	> Heaps
 	> Binary Heap
 

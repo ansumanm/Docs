@@ -1,0 +1,12 @@
+# String reverse iterator example;
+string str;
+
+for(auto it = str.rbegin(); it != str.rend(); ++it);
+
+# char to integer
+char_i = '1';
+int i = char_i - '0';
+
+# Str to integer
+char *str_1 = "1";
+int i = atoi(str_1);

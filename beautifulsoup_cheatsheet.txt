@@ -1,0 +1,22 @@
+BeautifulSoup Cheatsheet
+========================
+Objects:-
+tag << Represents html/xml tag 
+
+from bs4 import BeautifulSoup
+soup = BeautifulSoup('<h1 id="message>" Hello , Requests </h1>')
+tag = soup.h1
+tag.name << h1
+tag.id << message
+
+NavigableString Object represents contents of tag
+tag.string << Hello, Requests
+
+Comment Object
+
+Searching the Tree:-
+find
+find_all
+
+attributes, recursive, text
+

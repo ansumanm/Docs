@@ -1,0 +1,34 @@
+# Create a project
+django-admin startproject mysite
+
+# Run a development server
+python manage.py runserver
+
+# Change listen port
+python manage.py runserver 0:8080
+
+# Add entry to allowed_hosts list
+In setting.py, add entries to allowed_hosts list.
+
+# Create a app
+python manage.py startapp polls
+
+# Setup databases
+python manage.py migrate
+
+# Update changes to our models.
+python manage.py makemigrations polls
+
+# Manage database schema.
+python manage.py sqlmigrate polls 0001
+
+# Update the database
+python manage.py migrate
+
+# Manage model changes summary
+Change your models (in models.py).
+Run "python manage.py makemigrations" to create migrations for those changes
+Run "python manage.py migrate" to apply those changes to the database.
+
+# Create super user
+python manage.py createsuperuser

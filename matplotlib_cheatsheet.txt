@@ -1,0 +1,24 @@
+Architecture:-
+Logically structured into 3 layers.
+Communication is unidirectional.
+scripting
+artist
+backend
+
+Backend:- Lowest Layer
+	-> FigureCanvas
+	-> Renderer
+	-> Event
+
+Artist:- All that you can look inside a figure is an artist.
+Title, axis label, marker.
+Two Artist Classes:-
+primitive:- Individual object that constitutes the basic elements.
+composite:- Consists of primitive artists
+
+Artist Objects:-
+Figure
+Axes
+Axis Locator, Formatter
+
+Scripting Layer: (pyplot)

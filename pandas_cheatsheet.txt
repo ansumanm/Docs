@@ -2,5 +2,106 @@
 import pandas as pd
 ...
 
+# SERIES
+# https://pandas.pydata.org/pandas-docs/stable/dsintro.html?highlight=series
+# Attributes:- 
+s.name 
+# Methods: -
+s.rename('something') --> rename name
+# Create a series
+s2 = pd.Series([1, 2, 3, 4], index=['a', 'b', 'c', 'd'])
+
+# Create series from dictionary
+s2 = pd.Series({'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5})
+
+# Number of elements:- 
+len(s)
+
+# Some functions:-
+s.shape
+s.count()
+s.unique()
+s.value_counts()
+s.index
+s.values
+
+Access element:-
+s.loc[index]
+
+# DATAFRAME
+# Creation:-
+1) From Numpy array
+pd.DataFrame(np.array([[10, 11], [20, 21]]))
+
+2) From Series
+df1 = pd.DataFrame([pd.Series(np.arange(10, 15)), 
+                       pd.Series(np.arange(15, 20))])
+
+3) Specify columns in Constructor.
+df = pd.DataFrame(np.array([[10, 11], [20, 21]]), 
+                     columns=['a', 'b'])
+
+# Some functions
+df.columns
+df.index
+df.values
+
+# Drop columns
+df.drop(['A', 'B'], axis = 1, inplace = True)
+
 # Print column names of a pandas dataframe 
 print(df.columns)
+
+# Rename Columns
+df.rename(columns={'oldName1': 'newName1', 'oldName2': 'newName2'}, inplace=True)
+
+# Convert rows to columns
+df = df.transpose()
+
+# Select a column
+ohlc_df = df[['ohlc']]
+
+# Set index 
+df.set_index('<index name>',inplace=True)
+
+# Select a row
+s = ohlc_df.iloc[0]
+Returns a pandas.Series object
+pandas.Series:- consists of an index and a sequence of values
+
+# Insert a row
+df.loc[1] = ['a', 'b', 'c']
+
+# Insert rows from lists
+df.loc['indexname'] = 
+# https://www.shanelynn.ie/select-pandas-dataframe-rows-and-columns-using-iloc-loc-and-ix/
+
+# Put single value at passed column and index
+DataFrame.set_value(index, col, value, takeable=False)
+
+Parameters:	
+index : row label
+col : column label
+value : scalar value
+takeable : interpret the index/col as indexers, default False
+Returns:	
+frame : DataFrame
+If label pair is contained, will be reference to calling DataFrame, otherwise a new object
+
+# Get the index of a row.
+index = df.iloc[-1].name
+
+# How a make a list out of column.
+dfList = df['one'].tolist()
+
+# Query a dataframe
+df[df['A'].str.contains("hello")]
+df.loc[df['column_name'] == some_value]
+df.loc[df['column_name'].isin(some_values)]
+df.loc[(df['column_name'] == some_value) & df['other_column'].isin(some_values)]
+df.loc[df['column_name'] != some_value]
+df.loc[~df['column_name'].isin(some_values)]
+
+
+# Numpy array from dataframe
+np_array = df.iloc[:, 1:2].values
