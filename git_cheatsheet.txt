@@ -159,3 +159,12 @@ How to check if we need to pull from remote
 3) git show-branch *master #  will show you the commits in 
    # all of the branches whose names end in 'master'
 4) git pull # To pull in the changes.
+
+-------------------------------------------------------------
+Set vscode as editor
+-------------------------------------------------------------
+1) Configure:-
+git config --global core.editor "code --wait"
+
+2) Test if configured successfully:-
+git config --global -e
