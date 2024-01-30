@@ -1,4 +1,4 @@
-## Summary of OpenSSL Asymmetric Key Encryption Conversation
+## OpenSSL Asymmetric Key Encryption
 
 ### Generating Asymmetric Keys with OpenSSL
 
