@@ -13,4 +13,20 @@
   - Involves storing frequently acccessed data or computed results in a cache, closer to the application layer.
   - Reduces load on backend systems and improves response times.
 
+# Common patterns for Scalable Software Architecture
+- ### Microservices
+  - It involves breaking down a monolithic application into smaller, loosly coupled services, each responsible for a specific business capability.
+  - These services can be developed, deployed and scaled independently, allowing for greater agility and scalability.
+  - Microservices enable fault isolation. Issues in one service do not affect the entire system.
+- ### Load Balancing
+  - Distribute incoming network traffic across multiple servers or computing resources.
+  - With load balancing, you can scale horizontally, by adding more servers or instances as the traffic increases, ensuring high availability and performance.
+- ### Vertical Scaling:
+  - Involves adding more resources, such as CPU, memory or storage to a single server or instance.
  
+# Best practices for scalable software architecture
+- ### Use Cloud Computing
+  - IaaS - Infrastructure as a service
+  - PaaS - Platform as a service
+- ### Monitor System Performance
+- ### Carry Out Automated Testing
