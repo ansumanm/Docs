@@ -30,3 +30,21 @@
   - PaaS - Platform as a service
 - ### Monitor System Performance
 - ### Carry Out Automated Testing
+
+# Enhancing Application Security with Design Patterns
+- ### Model-View-Controller(MVC) pattern
+  Separate the application into three interconnected components:
+  - #### Model
+    Represents the data and teh business logic of the application.
+  - #### View
+    Represents the user interface
+  - #### Controller
+    Acts as an intermediary between model and view.
+
+- ### Factory pattern
+  Provides a way to encapsulate the creation of objects and to control their lifecycle.
+  Factory could be used to create and manage database connections, ensuring that only authorized users can access the database.
+
+- ### Observer pattern
+  Allows objects to communicate with each other without being tightly coupled. An observer could monitor login attempts and notify the controller when a suspicious login attempt occurs.
+    
