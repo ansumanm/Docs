@@ -39,13 +39,14 @@
   - ### Factory Method pattern
     - Defines an interface for creating an object, but lets the subclasses alter the type of objects that will be created. It is used when a class cannot anticipate the class of object that it has to create.
   - ### Abstract Factory pattern
-  - Provides an interface for creating families or related or dependent objects without specifying their concrete classes.
-  - Used when the system needs to be independent of how its products are created, composed or represented.
+    - Provides an interface for creating families or related or dependent objects without specifying their concrete classes.
+    - Used when the system needs to be independent of how its products are created, composed or represented.
 
 - ## Behavioral Patterns
   - ### Observer pattern:
     - Defines a dependency between objects so that when one object changess state, all its dependents are notfied and updated automatically. This is widely used in implementing distributed event handling systems.
 
+- ## Other Patterns
 - ### Model-View-Controller(MVC) pattern
   Separate the application into three interconnected components:
   - #### Model
@@ -55,10 +56,5 @@
   - #### Controller
     Acts as an intermediary between model and view.
 
-- ### Factory pattern
-  Provides a way to encapsulate the creation of objects and to control their lifecycle.
-  Factory could be used to create and manage database connections, ensuring that only authorized users can access the database.
 
-- ### Observer pattern
-  Allows objects to communicate with each other without being tightly coupled. An observer could monitor login attempts and notify the controller when a suspicious login attempt occurs.
     
