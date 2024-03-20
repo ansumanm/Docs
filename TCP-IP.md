@@ -10,6 +10,7 @@
 9. [TCP header options](#tcp-header-options)
 10. [Maximum Segment Size](#maximum-segment-size)
 11. [Path MTU Discovery](#path-mtu-discovery)
+12. [## Timestamps](#timestamps)
 
 ## TCP header
 
@@ -281,3 +282,26 @@ MSS = Interface MTU - IP header size - TCP header size
   - **Fragmentation Needed and DF set**: If any of the packets encounter a router with a smaller MTU on the path to the destination, the router drops the packet and sends back an ICMP "Fragmentation Needed and DF set" message to the source. This message includes the MTU of that link indicating the largest packet size it can forward.
   - **Adjusting the MTU**: The source adjusts its packet size to match the reported MTU and retransmits the packet.
 For IPV6, ICMPv6 "Packet too big" message is generated.
+
+## Timestamps
+The TCP timestamps option serves two primary purposes:
+  - RTT (Round Trip Time)
+  - PAWS (Protection against wrapped sequence numbers)
+It consists of two fields, each 4 bytes long:
+  - **TS Value (TSval)**: Contains the current value of the timestamp clock of the TCP sender.
+  - **TS Echo Reply (TSecr)**: Used to echo the most recent Timestamp value received from the remote TCP endpoint.
+
+### Enabling Timestamps:
+  -  The use of the timestamps option is negotiated at the start of the TCP connection. Both TCP endpoints must indicate their support for the option in the SYN segments during the 3-way segment.
+  -  Once enabled, all TCP segments sent during the connection should include the Timestamps options
+
+### Round-Trip Time Measurement:
+  - **Timestamping packets:** When a TCP segment is sent, the sender includes its current timestamp in the TSval field.
+  - **Echoing Timestamps:** The receiver echoes this timestamp back to the sender in the TSecr field of its ACK packets.
+  - **Calculating RTT:** By comparing the echoed timestamp with its current timestamp, the sender can accurately calculate RTT.
+
+### Protection against Wrapped Sequence Numbers (PAWS):
+  - **Sequence Number Wraparound:** With high-speed networks, and long duration connections, there's a theoritical risk that TCP sequence numbers might wrap around.
+  - **Timestamps as a Solution:** The Timestamps option helps to distinguish between new and old segments that might have the same sequence numbers, by checking the timestamp values. A TCP segment is discarded if it has a sequence number that appears to be valid but carries an older timestamp than expected.
+  - **Timestamp Validation:** Each TCP segment's timestamp is compared against the last received timestamp to ensure that no out-of-date segments are accepted.
+
