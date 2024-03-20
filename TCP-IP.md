@@ -11,6 +11,7 @@
 10. [Maximum Segment Size](#maximum-segment-size)
 11. [Path MTU Discovery](#path-mtu-discovery)
 12. [Timestamps](#timestamps)
+13. [Window Scale](#window-scale)
 
 ## TCP header
 
@@ -305,3 +306,12 @@ It consists of two fields, each 4 bytes long:
   - **Timestamps as a Solution:** The Timestamps option helps to distinguish between new and old segments that might have the same sequence numbers, by checking the timestamp values. A TCP segment is discarded if it has a sequence number that appears to be valid but carries an older timestamp than expected.
   - **Timestamp Validation:** Each TCP segment's timestamp is compared against the last received timestamp to ensure that no out-of-date segments are accepted.
 
+## Window Scale
+The TCP window size field in the header specifies the amount of data in bytes that a sender can transmit before needing an acknowledgement from the reciever, effectively controlling the flow of data to prevent congestion. However, the original TCP specification limits this field to 16 bits, capping the maximum window size at 64KB, which can be insufficient for modern high-speed networks.
+  - **Purpose:** It extends the maximum window size beyond 65535 bytes by allowing both sender and receiver to negotiate a scale factor used to left-shift the window size value. The scale factor increases the effective range of the window size.
+  - **Negotiation During Connection Establishment:** Both the client and server must indicate their support for the the Window Scale option in the options field of their initial SYN and SYN-ACK packets.
+  - **Scale Factor:** The scale factor is a single byte in length, allowing a maximum shift of 14 bits. This means the maximum window size can be scaled up to 1GB (2^14 * 64KB).
+  - **Applications:** The Window Scale factor is applied to window size field in all subsequent TCP segments for the duration of the connection. The window size is only scaled in the direction it is sent. That is, the sender of the window scale option scales the window size it advertises to the receiver according to its own scale factor.
+When the Window Scale option is negotiated at the start of a TCP connection, each TCP endpoint informs the other of the scale factor it wishes to apply to the receive window size it advertises. This means:
+When Host A sends a Window Scale option in its SYN packet, it's telling Host B, "This is the scale factor you should apply to the window size I advertise to you." In other words, Host A is determining how its inbound window size (for data it receives) is scaled.
+Conversely, when Host B responds with its own Window Scale option, it's specifying the scale factor that Host A should apply to the window size Host B advertises to Host A.
