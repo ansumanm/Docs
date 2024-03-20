@@ -6,7 +6,8 @@
 5. [TCP Implementation Overview](#tcp-implementation-overview)
 6. [TCP connection states](#tcp-connection-states)
 7. [TCP connection open 3-way handshake](#tcp-connection-open-3-way-handshake)
-7. [TCP connection close 4-way handshake](#tcp-connection-close-4-way-handshake)
+8. [TCP connection close 4-way handshake](#tcp-connection-close-4-way-handshake)
+9. [TCP header options](#tcp-header-options)
 
 ## TCP header
 
@@ -208,3 +209,23 @@ These states are part of the TCP finite state machine, which governs the lifecyc
   The server sends FIN segment to client
 - ### Ack from Client
   THe client sends ACK to acknowledge the FIN.The client goes to TIME_WAIT state  ( usually a duration of 2*MSL - Maximum Segment Lifetime) to ensure all packets have been properly received and to avoid potential conflicts with the new connection.
+
+## TCP header options
+Here's an expanded table that includes both the previously mentioned TCP options and some additional ones, capturing a broader range of TCP header options for enhanced functionalities and optimizations:
+
+| Option                         | Description                                                                                                                                                              | Use Case                                                                 |
+|--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| Maximum Segment Size (MSS)     | Specifies the max amount of data in a single TCP segment.                                                                                                               | Optimizes segment size to prevent IP fragmentation.                     |
+| Window Scale (WSopt)           | Scales the window size field to allow for larger window sizes.                                                                                                           | Enhances data transmission efficiency in high-speed networks.           |
+| Selective Acknowledgment (SACK)| Allows acknowledging non-contiguous blocks of data.                                                                                                                      | Improves efficiency in lossy conditions by reducing unnecessary retransmissions. |
+| Timestamps                     | Supports RTT measurements and protects against sequence number wrapping (PAWS).                                                                                         | Enables accurate RTT calculation and handles sequence number issues in long-lived connections. |
+| No-Operation (NOP)             | Used as padding to align options on 32-bit boundaries or as filler.                                                                                                      | Facilitates option alignment without conveying specific functionality.  |
+| End of Option List (EOOL)      | Marks the end of the options list in the TCP header.                                                                                                                     | Indicates where options end and payload data begins.                    |
+| Experimental (EXP)             | Reserved for experimental use, identified by specific kinds.                                                                                                             | Used for testing new features not intended for general use.             |
+| Quick-Start Response (QS)      | Allows TCP connections to request and use higher initial sending rates.                                                                                                  | Reduces time to ramp up to full speed in high-capacity networks (experimental). |
+| User Timeout Option (UTO)      | Configures the user timeout value for unacknowledged data.                                                                                                               | Defines the maximum time before a connection is forcibly closed due to unacknowledged data. |
+| TCP Authentication Option (TCP-AO) | Provides a mechanism for authenticating TCP segments.                                                                                                                  | Enhances security by preventing unauthorized segment insertion.          |
+| Multipath TCP (MPTCP)          | Allows multiple paths for a single TCP flow.                                                                                                                             | Improves redundancy and potentially increases throughput.               |
+| TCP Fast Open (TFO)            | Allows data to be sent during the initial handshake process.                                                                                                             | Reduces the latency involved in opening a TCP connection.               |
+
+This table includes a range of TCP options designed to address various network conditions, performance optimization needs, and security requirements, showcasing the protocol's adaptability and evolution over time.
