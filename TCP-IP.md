@@ -10,7 +10,7 @@
 9. [TCP header options](#tcp-header-options)
 10. [Maximum Segment Size](#maximum-segment-size)
 11. [Path MTU Discovery](#path-mtu-discovery)
-12. [## Timestamps](#timestamps)
+12. [Timestamps](#timestamps)
 
 ## TCP header
 
