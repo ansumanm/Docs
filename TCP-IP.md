@@ -8,6 +8,8 @@
 7. [TCP connection open 3-way handshake](#tcp-connection-open-3-way-handshake)
 8. [TCP connection close 4-way handshake](#tcp-connection-close-4-way-handshake)
 9. [TCP header options](#tcp-header-options)
+10. [Maximum Segment Size](#maximum-segment-size)
+11. [Path MTU Discovery](#path-mtu-discovery)
 
 ## TCP header
 
@@ -229,3 +231,17 @@ Here's an expanded table that includes both the previously mentioned TCP options
 | TCP Fast Open (TFO)            | Allows data to be sent during the initial handshake process.                                                                                                             | Reduces the latency involved in opening a TCP connection.               |
 
 This table includes a range of TCP options designed to address various network conditions, performance optimization needs, and security requirements, showcasing the protocol's adaptability and evolution over time.
+
+## Maximum Segment Size
+During connection establishment, the client and the server set the MSS option in their SYN packet.
+MSS is calculated as follows:
+MSS = Interface MTU - IP header size - TCP header size
+    = 1500 - 20 - 20
+    = 1460 bytes
+
+### Path MTU Discovery
+  - **Don't Fragment (DF) bit**: The source sets the DF bit in the IP header of outgoing packets. This instructs routers not to fragment these packets.
+  - **Sending Initial Packets**: The source initially sends packets with MTU of its local interface.
+  - **Fragmentation Needed and DF set**: If any of the packets encounter a router with a smaller MTU on the path to the destination, the router drops the packet and sends back an ICMP "Fragmentation Needed and DF set" message to the source. This message includes the MTU of that link indicating the largest packet size it can forward.
+  - **Adjusting the MTU**: The source adjusts its packet size to match the reported MTU and retransmits the packet.
+For IPV6, ICMPv6 "Packet too big" message is generated.
