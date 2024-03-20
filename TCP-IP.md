@@ -3,6 +3,7 @@
 2. [Retransmission](#retransmission-of-missing-data----automatic-repeat-request-arq)
 3. [Congestion Control](#congestion-control)
 4. [Setsocketopt](#setsockopt)
+5. [TCP Implementation Overview](#tcp-implementation-overview)
 
 ## TCP header
 
@@ -127,3 +128,43 @@ List of some common socket options that can be passed to `setsockopt()`, along w
 | `IPPROTO_TCP`     | `TCP_KEEPCNT`                | Sets the number of keepalive probes before a connection is considered dropped.                |
 
 This table provides an overview of some of the options you can set with `setsockopt()` to customize the behavior of your sockets in a POSIX environment.
+
+## TCP Implementation Overview
+- ### Protocol registration:
+  TCP, like other network protocols in the Linux kernel, is registered in the networking subsystem using a protocol family-specific structure
+  (**inet_connection_sofk_af_ops** for IPv4, for example). The registration process includes pointers to functions that handle various aspects of the protocol, such as socket creation, state transitions and data transmission/reception.
+- ### Socket Layer Integrations:
+  At user levet, applications interact with TCP through sockets using the socket API:-
+    - **socket()**
+    - **connect()**
+    - **listen()**
+    - **accept()**
+    - **send()**
+    - **recv()**
+- ### TCP Control Blocks:
+  The main data structures used to manage TCP connections are:-
+    - **sock(or socket)**: Represents and endpoint for communication.
+    - **inet_sock**: Inherits from **sock** and is used for IP-based sockets, adding fields specific to UP protocols like IP addresses and ports.
+    - **tcp_sock**: Further specializes inet_sock for TCP, containing TCP-specific information such as sequence numbers, window sizes and various flags indicating the state of the TCP connection.
+- ### TCP State Machine:
+  Different states of TCP connection are
+  - **LISTEN**
+  - **SYN_SENT**
+  - **SYN_RECEIVED**
+  - **ESTABLISHED**
+  - **FIN_WAIT_1**
+  - **FIN_WAIT_2**
+  - **CLOSE_WAIT**
+  - **CLOSING**
+  - **CLOSED**
+  - **LAST_ACK**
+  - **TIME_WAIT**
+  - **BOUND**
+- ### Buffers and Queues:
+  - #### Send Buffer
+  - #### Receive Buffer
+  - #### Out-of-Order Queue
+- ### Congestion Control and Flow Control
+  Implementation includes algorithms for congestion control and flow control. These mechanisms adjust the rate of data transmission based on network conditions and receiver capabilities to optimize throughput and prevent congestion.
+- ### Timers
+  Various timers used to manage retransmission, detect dead connections etc.
