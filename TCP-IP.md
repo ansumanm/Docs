@@ -14,6 +14,7 @@
 13. [Window Scale](#window-scale)
 14. [IP header](#ip-header)
 15. [IP header flags](#ip-header-flags)
+16. [IP header options](#ip-header-options)
 
 ## TCP header
 
@@ -354,3 +355,28 @@ The IP header includes a field for flags, which is used to control or identify f
 - **More Fragments (MF) (Bit 2):** This bit is used to control the fragmentation process. If set, it indicates that this packet is a fragment and that more fragments are following this one. The last fragment of a packet has this bit cleared to signal the end of the fragments.
 
 Understanding these flags is essential for troubleshooting network issues related to packet fragmentation and ensuring efficient data transmission over networks with varying MTUs (Maximum Transmission Units).
+
+## IP header options
+
+| Option Name                       | Option Code | Description                                                                                                  | Use Cases                                                                                     |
+|-----------------------------------|-------------|--------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| End of Option List                | 0           | Indicates the end of the option list.                                                                        | Marks the end of options in the IP header.                                                    |
+| No Operation (NOP)                | 1           | Used for padding to align subsequent options or for separating options.                                      | Alignment and separation of options in the IP header.                                         |
+| Security                          | 130         | Provides a way to carry security classification levels for the data.                                         | Used for transmitting sensitive data across networks with security classifications.            |
+| Loose Source Routing (LSR)        | 131         | Allows the sender to specify an intermediate route for the packet.                                           | Testing, debugging, or specific routing needs to dictate a packet's path through the network. |
+| Internet Timestamp                | 68          | Records timestamps for each point the datagram traverses.                                                    | Diagnostics, including round-trip time measurements and identifying path issues.               |
+| Record Route                      | 7           | Records the route of an IP packet as it traverses the network.                                               | Route tracking and diagnostics to see the path taken by packets.                              |
+| Strict Source Routing (SSR)       | 137         | Specifies a strict list of routers through which the packet must pass.                                       | Specifying an exact path for a packet to follow through the network.                          |
+| Stream ID (Deprecated)            | 136         | Used to identify a particular stream of data between a source and destination.                               | (Deprecated) Used in experimental protocols, not common in general networking.                |
+| Extended Security (Deprecated)    | 133         | Was intended for additional security features beyond the basic Security option.                               | (Deprecated) Enhanced security measures.                                                      |
+| Commercial Security (Deprecated)  | 134         | Aimed to provide commercial security levels.                                                                  | (Deprecated) Commercial-level security.                                                       |
+| Router Alert                      | 148         | Allows a host to specify that routers should examine this packet more closely.                               | Ensuring packets are processed by routers for functions like RSVP or IGMP.                    |
+| Selective Directed Broadcast Mode | 149         | Specifies how a packet should be distributed when it reaches a directed broadcast address.                   | Controlling the distribution of broadcast packets in a network.                              |
+| Traceroute                        | 82          | Used to record information about the route a packet has taken, intended for diagnostic purposes.             | Network diagnostics and path tracing.                                                        |
+| Address Extension                 | 147         | Used for carrying additional source or destination addresses, for special routing purposes.                  | Special routing scenarios requiring additional addresses.                                    |
+| Quick-Start                       | 25          | Used to request and report the available bandwidth between hosts, for congestion control.                    | Congestion control and bandwidth management.                                                  |
+| MTU Probe                         | 11          | Used to discover the Path MTU between two IP hosts.                                                         | Discovering the maximum transmission unit path to avoid fragmentation.                        |
+| MTU Reply                         | 12          | A response to the MTU Probe, indicating the discovered Path MTU.                                            | Responding to MTU discovery processes.                                                        |
+| Experimental                      | Various     | Reserved for experimental use, allowing for the testing of new features without affecting standard operations.| Testing and development of new network technologies and features.                             |
+
+This table encompasses a range of IP header options, from those integral to the protocol's operation to those that are deprecated or used for specific, less common purposes. The actual implementation and support for these options can vary, and their usage can impact network performance, security, and compatibility.
