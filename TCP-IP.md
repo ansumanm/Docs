@@ -13,6 +13,7 @@
 12. [Timestamps](#timestamps)
 13. [Window Scale](#window-scale)
 14. [IP header](#ip-header)
+15. [IP header flags](#ip-header-flags)
 
 ## TCP header
 
@@ -338,3 +339,18 @@ The IP (Internet Protocol) header is a crucial component of the data packets use
 | Padding               | Variable    | Ensures the header is a multiple of 32 bits in length. Used if the Options field is used.     |
 
 This table outlines the structure and purpose of each field within an IPv4 header, offering a fundamental understanding of how IP packets are constructed and managed across networks. IPv6 headers have a different structure and set of fields, designed to accommodate a larger address space and improve the efficiency of packet handling.
+
+## IP header flags
+The IP header includes a field for flags, which is used to control or identify fragments of a datagram. These flags are part of the fragmentation and reassembly process, allowing a large datagram to be broken into smaller fragments for transmission over a network that cannot support the original datagram size. Upon reaching the destination, these fragments can be reassembled to form the original message. The flags field is 3 bits in length, and here's a breakdown of what each bit represents in a tabular form:
+
+| Bit  | Name                 | Description                                                                                    |
+|------|----------------------|------------------------------------------------------------------------------------------------|
+| 0    | Reserved             | Always set to 0; it's a reserved bit and not used.                                             |
+| 1    | Don't Fragment (DF)  | If set to 1, the datagram cannot be fragmented. It's used to ensure the packet remains intact. |
+| 2    | More Fragments (MF)  | If set to 1, indicates that this packet is not the last fragment of a datagram.                |
+
+- **Reserved (Bit 0):** This bit is reserved for future use and should always be set to 0.
+- **Don't Fragment (DF) (Bit 1):** When set, it tells routers not to fragment this packet. If the packet size exceeds the Maximum Transmission Unit (MTU) of the network and this bit is set, the packet will be dropped, and an ICMP error message is sent back to the sender.
+- **More Fragments (MF) (Bit 2):** This bit is used to control the fragmentation process. If set, it indicates that this packet is a fragment and that more fragments are following this one. The last fragment of a packet has this bit cleared to signal the end of the fragments.
+
+Understanding these flags is essential for troubleshooting network issues related to packet fragmentation and ensuring efficient data transmission over networks with varying MTUs (Maximum Transmission Units).
