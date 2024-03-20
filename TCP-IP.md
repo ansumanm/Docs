@@ -4,6 +4,7 @@
 3. [Congestion Control](#congestion-control)
 4. [Setsocketopt](#setsockopt)
 5. [TCP Implementation Overview](#tcp-implementation-overview)
+6. [TCP connection states](#tcp-connection-states)
 
 ## TCP header
 
@@ -168,3 +169,22 @@ This table provides an overview of some of the options you can set with `setsock
   Implementation includes algorithms for congestion control and flow control. These mechanisms adjust the rate of data transmission based on network conditions and receiver capabilities to optimize throughput and prevent congestion.
 - ### Timers
   Various timers used to manage retransmission, detect dead connections etc.
+
+## TCP connection states
+
+| State             | Description                                                                                   |
+|-------------------|-----------------------------------------------------------------------------------------------|
+| `CLOSED`          | Indicates that the connection is not currently in use.                                        |
+| `LISTEN`          | Waiting for a connection request from any remote TCP and port.                                |
+| `SYN_SENT`        | A connection request has been sent; waiting for acknowledgment.                               |
+| `SYN_RECEIVED`    | Initial synchronization (SYN) request received and responded with SYN-ACK; awaiting ACK.      |
+| `ESTABLISHED`     | The connection has been established; data can be sent and received.                           |
+| `FIN_WAIT_1`      | The application has requested to close the connection; waiting for the remote TCP to acknowledge the request. |
+| `FIN_WAIT_2`      | The first FIN has been acknowledged; waiting for the remote TCP's connection termination request. |
+| `CLOSE_WAIT`      | The remote TCP has initiated a connection termination request; waiting for the application to request to close the connection. |
+| `CLOSING`         | Both sides have initiated a connection termination but neither side has completed it yet.     |
+| `LAST_ACK`        | Waiting for the last acknowledgment after sending a termination request and receiving a FIN.  |
+| `TIME_WAIT`       | Waiting for enough time to pass to ensure the remote TCP received the acknowledgment of its connection termination request. |
+| `BOUND`           | Optional state used to indicate that the socket is bound to an address but not yet in a state where it is ready to connect or listen. (Not always considered a distinct TCP state in all implementations.) |
+
+These states are part of the TCP finite state machine, which governs the lifecycle of a TCP connection from initiation through data transfer and finally to termination. Understanding these states is crucial for diagnosing network issues and for developing network applications.
