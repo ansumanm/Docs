@@ -15,6 +15,7 @@
 14. [IP header](#ip-header)
 15. [IP header flags](#ip-header-flags)
 16. [IP header options](#ip-header-options)
+17. [IP fragmentation](#ip-fragmentation)
 
 ## TCP header
 
@@ -380,3 +381,19 @@ Understanding these flags is essential for troubleshooting network issues relate
 | Experimental                      | Various     | Reserved for experimental use, allowing for the testing of new features without affecting standard operations.| Testing and development of new network technologies and features.                             |
 
 This table encompasses a range of IP header options, from those integral to the protocol's operation to those that are deprecated or used for specific, less common purposes. The actual implementation and support for these options can vary, and their usage can impact network performance, security, and compatibility.
+
+## IP fragmentation
+The following fields of the IP header are used in fragmentation
+  - ### Total Length:
+    Specifies the total length of the IP datagram, including the header and the data.
+  - ### Identification:
+    All fragments of a packet carry the same Identification value, enabling the receiving end to group them together correctly.
+  - ### Flags:
+    -  **DF(Don't Fragment):** If set, the flag indicates that the packet should not be fragmented.
+    -  **MF(More Fragments):** This flag is set on all fragments except the last one.
+  - ### Fragment Offset:
+    This field indicates the position of the fragment's data within the original IP packet.It is 13 bits long. It contains a value that represents the offset, or position, of the fragment's data in the original IP packet. The offset is measured in units of 8 bytes (64 bits).
+    #### Example
+    If an IP packet is 4000 bytes long, and has to pass through a network with an MTU of 1500 bytes, excluding the header (assuming 20 bytes of IP header) each fragment can carry up to 1480 bytes of the original packet's data.
+      - The first fragment would have a Fragment Offset of 0.
+      - The second fragment would carry the next portion of the data. Its Fragment Offset would be 185 (1480/8), indicating that the data starts at byte 1480 of the original packet.
