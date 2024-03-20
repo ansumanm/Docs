@@ -45,7 +45,15 @@ Indicates the length of the TCP header in 32-bit words. It is needed because Opt
 Should be set to 0
 
 ### Flags (6 bits)
-Contains 9 different flags(URG, ACK, PSH, RST, SYN, FIN and 3 reserved bits)
+| Flag | Name               | Description                                                                                             | Use Case                                                                                     |
+|------|--------------------|---------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| URG  | Urgent             | Indicates that the Urgent pointer field is significant and that data should be processed immediately.  | Used for data that should be prioritized, such as interrupts or immediate action requests.   |
+| ACK  | Acknowledgment     | Acknowledges receipt of data. Must be set in all packets except the initial SYN packet.                | Essential for the reliable delivery mechanism of TCP, confirming receipt of data.            |
+| PSH  | Push               | Instructs the receiving host to push this data to the application as soon as possible.                 | Ideal for interactive applications requiring low latency, like telnet or SSH.                |
+| RST  | Reset              | Resets the connection due to an error or because a packet was received for a non-existent connection.  | Used to abort a connection if a serious error occurs or to reject invalid packets.           |
+| SYN  | Synchronize        | Used during the initial connection setup phase to synchronize sequence numbers.                        | Critical for establishing a TCP connection, initiating sequence number synchronization.     |
+| FIN  | Finish             | Indicates that the sender has finished sending data and wishes to terminate the connection.           | Used to gracefully close a TCP connection after the data transfer is complete.               |
+
 
 ### Window Size (16 bits)
 #### Flow Control:
