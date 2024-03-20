@@ -62,6 +62,34 @@ The size of the sender's receive window(or buffer space available), which contro
 ### Checksum (16 bits)
 Used for error-checking of the header and data. It's calculated by the sender and verified by the receiver to ensure data integrity.
 
+This is how checksum is calculated:-
+1. A pseudo header is constructed
+
+#### IPv4 Pseudo Header Format
+
+| Field              | Size (bits) | Description                                |
+|--------------------|-------------|--------------------------------------------|
+| Source Address     | 32          | The IPv4 address of the sender.            |
+| Destination Address| 32          | The IPv4 address of the receiver.          |
+| Zeros              | 8           | Reserved field set to zero.                |
+| Protocol           | 8           | Protocol number for TCP (6).               |
+| TCP Length         | 16          | Length of the TCP header and data in bytes.|
+
+#### IPv6 Pseudo Header Format
+
+| Field              | Size (bits)  | Description                                         |
+|--------------------|--------------|-----------------------------------------------------|
+| Source Address     | 128          | The IPv6 address of the sender.                     |
+| Destination Address| 128          | The IPv6 address of the receiver.                   |
+| TCP Length         | 32           | Length of the TCP header and data in bytes.         |
+| Zeros              | 24           | Reserved for future use, set to zero.               |
+| Next Header        | 8            | Identifies the protocol used (TCP is represented as 6).|
+
+2. **Preparation for Checksum Calculation**
+The pseudo header, the TCP header, and the TCP data are arranged in a sequence of 16-bit words for the purpose of checksum calculation.
+
+3. **Checksum Computation**: The checksum algorithm sums all 16-bit words using 1's complement arithmetic. The sum itself is also represented as a 16-bit word and its 1's complement is taken to producte the final checksum value.
+
 ### Urgent Pointer (16 bits)
 If the URG flag is set, this 16-bit field is an offset from the sequence number indicating the last urgent data byte.
 
