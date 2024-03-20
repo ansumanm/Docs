@@ -12,6 +12,7 @@
 11. [Path MTU Discovery](#path-mtu-discovery)
 12. [Timestamps](#timestamps)
 13. [Window Scale](#window-scale)
+14. [IP header](#ip-header)
 
 ## TCP header
 
@@ -315,3 +316,25 @@ The TCP window size field in the header specifies the amount of data in bytes th
 When the Window Scale option is negotiated at the start of a TCP connection, each TCP endpoint informs the other of the scale factor it wishes to apply to the receive window size it advertises. This means:
 When Host A sends a Window Scale option in its SYN packet, it's telling Host B, "This is the scale factor you should apply to the window size I advertise to you." In other words, Host A is determining how its inbound window size (for data it receives) is scaled.
 Conversely, when Host B responds with its own Window Scale option, it's specifying the scale factor that Host A should apply to the window size Host B advertises to Host A.
+
+# IP header
+The IP (Internet Protocol) header is a crucial component of the data packets used for communication over networked devices. It contains various fields that provide instructions and information required for the routing and delivery of the packet from the source to the destination. Below is a table that explains the fields found in an IP header, particularly focusing on the IPv4 header for simplicity.
+
+| Field                 | Size (Bits) | Description                                                                                   |
+|-----------------------|-------------|-----------------------------------------------------------------------------------------------|
+| Version               | 4           | Indicates the version of the IP protocol. IPv4 is denoted by 4.                               |
+| Internet Header Length (IHL) | 4    | Specifies the header's length in 32-bit words. It points to where the data begins.           |
+| Type of Service (ToS) | 8           | Provides information about the packet's priority and the type of service desired.             |
+| Total Length          | 16          | Specifies the entire packet's size in bytes, including header and data.                       |
+| Identification        | 16          | Used for uniquely identifying the group of fragments of a single IP datagram.                 |
+| Flags                 | 3           | Controls and identifies fragments. Includes flags for more fragments and don't fragment.      |
+| Fragment Offset       | 13          | Indicates where in the datagram this fragment belongs.                                        |
+| Time to Live (TTL)    | 8           | Limits the datagram's lifetime, reducing by at least one each time it passes a router.        |
+| Protocol              | 8           | Indicates the next level protocol used in the data portion of the IP datagram.                |
+| Header Checksum       | 16          | Used for error-checking of the header.                                                        |
+| Source Address        | 32          | Specifies the sending node's IP address.                                                      |
+| Destination Address   | 32          | Specifies the receiving node's IP address.                                                    |
+| Options               | Variable    | Allows for various internet layer parameters to be set; it is optional and variable in length.|
+| Padding               | Variable    | Ensures the header is a multiple of 32 bits in length. Used if the Options field is used.     |
+
+This table outlines the structure and purpose of each field within an IPv4 header, offering a fundamental understanding of how IP packets are constructed and managed across networks. IPv6 headers have a different structure and set of fields, designed to accommodate a larger address space and improve the efficiency of packet handling.
