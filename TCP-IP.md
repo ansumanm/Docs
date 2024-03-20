@@ -5,6 +5,8 @@
 4. [Setsocketopt](#setsockopt)
 5. [TCP Implementation Overview](#tcp-implementation-overview)
 6. [TCP connection states](#tcp-connection-states)
+7. [TCP connection open 3-way handshake](#tcp-connection-open-3-way-handshake)
+7. [TCP connection close 4-way handshake](#tcp-connection-close-4-way-handshake)
 
 ## TCP header
 
@@ -188,3 +190,21 @@ This table provides an overview of some of the options you can set with `setsock
 | `BOUND`           | Optional state used to indicate that the socket is bound to an address but not yet in a state where it is ready to connect or listen. (Not always considered a distinct TCP state in all implementations.) |
 
 These states are part of the TCP finite state machine, which governs the lifecycle of a TCP connection from initiation through data transfer and finally to termination. Understanding these states is crucial for diagnosing network issues and for developing network applications.
+
+## TCP connection open 3-way handshake
+- ### SYN SENT
+  Client sends a TCP segment with the SYN buti set to 1. This segment also includes an initial sequence number chosen by the sender to start the sequence numbers of the segments it will send.
+- ### SYN-ACK Received
+  The server receives the SYN request, responds with a TCP segment that has both the SYN and ACK bits set to 1. The ACK bit acknowledges the sender's SYN packet by including an acknowledgement number that is one more than the received initial sequence number. The receiver also sets it ISN.
+- ### ACK Sent
+  The client receives the SYN-ACK packet and responds with a TCP segment where the ACK bit is set to 1. This acknowledgement packet includes and acknowledgement number that is one more that the received initial sequence number from the receiver.
+
+## TCP connection close 4-way handshake
+- ### FIN from Client
+  Client sends a TCP segment with FIN flag set to 1.
+- ### ACK from Server
+  The server sends ACK.
+- ### FIN from Server
+  The server sends FIN segment to client
+- ### Ack from Client
+  THe client sends ACK to acknowledge the FIN.The client goes to TIME_WAIT state  ( usually a duration of 2*MSL - Maximum Segment Lifetime) to ensure all packets have been properly received and to avoid potential conflicts with the new connection.
