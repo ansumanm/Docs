@@ -12,10 +12,11 @@
 11. [Path MTU Discovery](#path-mtu-discovery)
 12. [Timestamps](#timestamps)
 13. [Window Scale](#window-scale)
-14. [IP header](#ip-header)
-15. [IP header flags](#ip-header-flags)
-16. [IP header options](#ip-header-options)
-17. [IP fragmentation](#ip-fragmentation)
+14. [Quick-Start](#quick-start)
+15. [IP header](#ip-header)
+16. [IP header flags](#ip-header-flags)
+17. [IP header options](#ip-header-options)
+18. [IP fragmentation](#ip-fragmentation)
 
 ## TCP header
 
@@ -319,6 +320,28 @@ The TCP window size field in the header specifies the amount of data in bytes th
 When the Window Scale option is negotiated at the start of a TCP connection, each TCP endpoint informs the other of the scale factor it wishes to apply to the receive window size it advertises. This means:
 When Host A sends a Window Scale option in its SYN packet, it's telling Host B, "This is the scale factor you should apply to the window size I advertise to you." In other words, Host A is determining how its inbound window size (for data it receives) is scaled.
 Conversely, when Host B responds with its own Window Scale option, it's specifying the scale factor that Host A should apply to the window size Host B advertises to Host A.
+
+## Quick-Start
+The Quick-Start Request and Quick-Start Response options in TCP were proposed as a mechanism to allow TCP connections to quickly utilize available bandwidth in situations where the network is under-utilized. The traditional slow-start mechanism in TCP, designed to prevent congestion, can be sometimes too conservative. The Quick-Start process aims to address this by allowing a sender to request permission from routers along the path to send data at a higher initial rate.
+
+### How Quick-Start Works
+  1.  #### Quick-Start Request:
+      In the TCP header or IP header of a packet, the sender includes a Quick-Start Request, specifying a desired transmission rate in terms of bytes per interval. This request is made during the initial stages of the connection or when the connection has been idle for a long period.
+  2. #### Router Processing:
+     - Each router along the path checks its current load. If it can accommodate the requested rate without causing congestion, it forwards the packet, possibly adjusting the rate in the Quick-Start Request to a lower value if necessary based on its current capacity.
+     - If any router cannot accommodate the request, it reduces the rate to what it can support or mars the Quick-Start Request as not approved.
+  3. #### Quick-Start Response:
+     - The receiver of the Quick-Start Request packet reads the rate approved by the network and sends a Quick-Start Response back to the sender, indicating the rate that the sender is allowed to use.
+  4. #### Sender's Adjustment:
+     - Upon receiving the Quick-Start Response, the sender adjusts its sending rate according to the approved rate. This adjustment allows the sender to bypass the slow start phase, immediately increasing its transmission rate to the approved level, thereby improving the efficiency of data transfer.
+    
+### Quick-Start as IP header option
+#### IP Options Field
+It is also implemented as an IP option in the IP header to negotiate a higher initial data rate.
+#### Format
+The Quick-Start option in the IP header contains information such as the Rate Request, the QS Nonce, and the TTL of the packet when the Quick-Start Request was generated.
+#### Router Processing
+ As the IP packet with the Quick-Start option traverses the network, each router examines this option. If the router supports Quick-Start and has sufficient available bandwidth, it can approve or adjust the rate. If the router does not support Quick-Start or cannot accommodate the request, it can modify the option to indicate that the Quick-Start Request was not approved.
 
 # IP header
 The IP (Internet Protocol) header is a crucial component of the data packets used for communication over networked devices. It contains various fields that provide instructions and information required for the routing and delivery of the packet from the source to the destination. Below is a table that explains the fields found in an IP header, particularly focusing on the IPv4 header for simplicity.
