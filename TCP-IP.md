@@ -13,10 +13,11 @@
 12. [Timestamps](#timestamps)
 13. [Window Scale](#window-scale)
 14. [Quick-Start](#quick-start)
-15. [IP header](#ip-header)
-16. [IP header flags](#ip-header-flags)
-17. [IP header options](#ip-header-options)
-18. [IP fragmentation](#ip-fragmentation)
+15. [TCP Authentication Option](#tcp-authentication-option)
+16. [IP header](#ip-header)
+17. [IP header flags](#ip-header-flags)
+18. [IP header options](#ip-header-options)
+19. [IP fragmentation](#ip-fragmentation)
 
 ## TCP header
 
@@ -343,6 +344,23 @@ The Quick-Start option in the IP header contains information such as the Rate Re
 #### Router Processing
  As the IP packet with the Quick-Start option traverses the network, each router examines this option. If the router supports Quick-Start and has sufficient available bandwidth, it can approve or adjust the rate. If the router does not support Quick-Start or cannot accommodate the request, it can modify the option to indicate that the Quick-Start Request was not approved.
 
+## TCP Authentication Option
+It provides a way to authenticate TCP segments, ensuring that they are sent by the actual endpoints of the TCP connection and not by the attackers.
+### Key Features and Principles of TCP-AO
+-  **Message Authentication Code(MAC):** TCP-AO uses a MAC to authenticate TCP segments. The MAC is calculated over the TCP segment, including a pseudo-header and a shared secret key.
+-  **Key Management:** TCP-AO does not specify the key management mechanism within the protocol itself, allowing for the flexibility in how keys are distributed, managed and refreshed.
+-  **Replay Protection:**: TCP-AO includes mechanisms for replay protection, ensuring that captured packets cannot be resent by an attacker in an attempt to disrupt the connection or inject malicious data.
+-  **Algorithm Agility:** TCP-AO is designed to be algorithmically agile, meaning it can support various MAC algorithms
+
+### How TCP-AO works:
+- **Setup:** Both ends of a TCP connection agree on a secret key and MAC algorithm. This agreement can be achieved through manual configuration or through automated key management protocols.
+- **Segment Processing:** When a TCP segment is ready to be sent, the sender computes the MAC over the segment's content (including pseudo header and TCP-AO speficif fields) using the agreed-upon key. The resulting MAC is included in TCP-AO option of the segment.
+- **Verification:** Upon receiving a segment with the TCP-AO option, the receiver computes the expected MAC using the same algorithm and key, then compares it with the MAC value included in the segment. If the values match, the segment is considered authentic, if not it is discarded.
+- **Key Change and Replay Protection:** TCP-AO can employ techniques like sequence numbers or time-based counters to protect against replay attacks. Keys can be rotated periodically to maintain security.
+
+### Use Cases:
+- **BGP Sessions:** TCP-AO is particularly useful for securing BGP sessions between routers, where session hijacking or injection of incorrect routing information by attackers could have significant impacts on network routing.
+- **Data Centers and Critical Infrastructure:** Anywhere that TCP connections need protection from tampering, or session hijacking, especially where critical data is transmitted or system integrity is paramount.
 # IP header
 The IP (Internet Protocol) header is a crucial component of the data packets used for communication over networked devices. It contains various fields that provide instructions and information required for the routing and delivery of the packet from the source to the destination. Below is a table that explains the fields found in an IP header, particularly focusing on the IPv4 header for simplicity.
 
