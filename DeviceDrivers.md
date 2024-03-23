@@ -3,7 +3,8 @@
 2. [Hardware detection process](hardware-detection-process)
 3. [*/proc* file system](#proc-file-system)
 4. [*/sys* file system](#sys-file-system)
-5. [Kernel space](#kernel-space)
+5. [Process virtual memory map](#process-virtual-memory-map)
+6. [Kernel space](#kernel-space)
    
 # System bootup process
   - **Power-on and Initial Startup:**
