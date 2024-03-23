@@ -2,6 +2,7 @@
 1. [System bootup process](system-bootup-process)
 2. [Hardware detection process](hardware-detection-process)
 3. [*/proc* file system](#proc-file-system)
+4. [*/sys* file system](#sys-file-system)
    
 # System bootup process
   - **Power-on and Initial Startup:**
@@ -44,6 +45,8 @@
 
 # */proc* file system
 
+The /proc filesystem in Linux is a virtual filesystem that provides a window into the kernel's view of the system. It doesn't contain real files but rather, virtual files that allow users and applications to access kernel internals. Many of these virtual files contain information about the system hardware and the current status of various components. 
+
 | **File/Directory**          | **Description**                                                                 |
 |-----------------------------|---------------------------------------------------------------------------------|
 | `/proc/cpuinfo`             | Contains detailed information about the CPU(s), such as model, cores, and speed.|
@@ -57,3 +60,38 @@
 | `/proc/net/dev`             | Contains statistics about network interfaces, including performance data.       |
 
 
+# */sys* file system
+The */sys* filesystem in Linux, also known as *sysfs*, provides a structured and dynamic interface to the kernel's device model. Itt is designed to offer information about devices and drivers fromt eh system's perspective, making it easier for user space tools and applications to interact with and manage hardware devices.
+
+## Key Features and Uses of */sys*:
+### Device Information and Management
+*/sys* provides a wealth of information about devices connected to the system. It organizes devices by their type and bus, making it easier to find detailed information about specific hardware components, such as USB devices, PCI devices and network interfaces.
+
+### Driver Binding and Unbinding:
+It allows dynamic binding and unbinding of drivers to devices, which can be particularly useful for troubleshooting or for systems where devices need to be reconfigured on-the-fly.
+
+### Hardware Configuration:
+Through */sys*, users can modify certain hardware parameters, enabling or disabling features of devices as supported by their drivers. This can include toggling power management features, changing LED states, or adjusting performance settings.
+
+### Hotplug support:
+The filesystem plays a crucial role in supporting the hotplug mechanism, allowing the system to detect and configure hardware as it's physically added or removed.
+
+## Structure of */sys*:
+### ***/sys/devices***
+This directory contains a hierarchy reporesenting all devices and buses in the system. Devices are organized according to their pyysical or logical connection in the system,
+providing a comprehensive view of all hardware.
+
+### ***/sys/class***:
+Devices are grouped by class(type) here, providing a more intuitive way to access devices based on their functionality (e.g., */sys/class/net* for network interfaces, */sys/class/block* for storage devices).
+
+### ***/sys/block***:
+Lists block devices and allows access to attributes specific to storage operations.
+
+### ***/sys/bus***:
+Shows the various bus types and supports actions like scanning for new devices or directly interacting with bus drivers and devices.
+
+# */proc* vs */sys*
+- ## For Kernel and Process Info:
+  Prefer */proc* for accessing information related to the kernel's view of processes, or for adjusting certain kernel parameters that affects the system's operation but not directly tied to specific devices or drivers.
+- ## For Hardware and Device Info:
+  Use */sys* for tasks that involve direct interaction with hardware devices or when you need to read or modify device attributes. Sysfs's structured layout and device-centric approach make it ideal for managing hardware components and their drivers.
