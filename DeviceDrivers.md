@@ -1,6 +1,7 @@
 # Table of contents
 1. [System bootup process](system-bootup-process)
 2. [Hardware detection process](hardware-detection-process)
+3. [*/proc* file system](#proc-file-system)
    
 # System bootup process
   - **Power-on and Initial Startup:**
@@ -39,5 +40,20 @@
     - After the kernel has initialized the hardware, the system initialization scripts and services managed by system and service managers like *systemd* or *SysVinit* may
       perform additional configurations and start user-space services that require hardware access.
   - **Dynamic Detection with Tools and Daemons:**
-    - ***Dynamic Hardware Detection:*** Tools like *lsusb*, *lspci*, *lsblk* can be used to list USB devices, PCI devices and block devices respectively.These tools read from
-      various system interfacecs to present current hardware information.
+    - ***Dynamic Hardware Detection:*** Tools like *lsusb*, *lspci*, *lsblk* can be used to list USB devices, PCI devices and block devices respectively.These tools read from various system interfacecs to present current hardware information.
+
+# */proc* file system
+
+| **File/Directory**          | **Description**                                                                 |
+|-----------------------------|---------------------------------------------------------------------------------|
+| `/proc/cpuinfo`             | Contains detailed information about the CPU(s), such as model, cores, and speed.|
+| `/proc/meminfo`             | Provides details about the system's memory usage, including total and free memory.|
+| `/proc/interrupts`          | Lists the number of interrupts per CPU per I/O device.                          |
+| `/proc/diskstats`           | Offers detailed statistics for each disk device, including read/write operations.|
+| `/proc/device-tree/`        | Shows the device tree structure (mainly on systems like ARM), describing hardware components. Not available on all systems.|
+| `/proc/bus/pci`             | Contains information about PCI buses and devices on the system.                 |
+| `/proc/bus/usb`             | Provides information on USB buses and devices. This might be more commonly accessed through `/sys` or `lsusb` in modern systems.|
+| `/proc/loadavg`             | Shows the system load average, indicating the system's activity level.          |
+| `/proc/net/dev`             | Contains statistics about network interfaces, including performance data.       |
+
+
