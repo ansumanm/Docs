@@ -98,28 +98,20 @@ Shows the various bus types and supports actions like scanning for new devices o
   Use */sys* for tasks that involve direct interaction with hardware devices or when you need to read or modify device attributes. Sysfs's structured layout and device-centric approach make it ideal for managing hardware components and their drivers.
 
 # Process virtual memory map
-+------------------+ <- 0xFFFFFFFF
-|     Kernel       |
-|     Space        |
-+------------------+ 0xC0000000 (Example)
-|                  |
-|    Stack         | <- Grows downward
-|                  |
-+------------------+ <- 0xBFFFFFFF
-|    Mapped        |
-|    Region        | (for shared libraries or explicit memory mappings)
-+------------------+ 
-|                  |
-|                  |
-|    Heap          | <- Grows upward
-|                  |
-+------------------+ 
-|    BSS Segment   | (Block Started by Symbol: Uninitialized Data)
-+------------------+
-|    Data Segment  | (Initialized Data)
-+------------------+
-|    Text Segment  | (Executable Code)
-+------------------+ <- 0x00000000
+Below is a simplified representation for a generic 32-bit Linux process. Note that actual sizes and specific addresses can vary based on system configuration, architecture, and the process itself.
+
+| Segment             | Address Range                   | Description                                                                 |
+|---------------------|---------------------------------|-----------------------------------------------------------------------------|
+| Kernel Space        | 0xC0000000 - 0xFFFFFFFF (upper 1GB) | Reserved for the kernel; inaccessible from user-space processes.            |
+| Stack               | Variable, grows downward        | Stores local variables, function parameters, return addresses, and control data. Located near the top of the user space. |
+| Memory Mappings     | Variable                        | Includes shared libraries, memory-mapped files, etc. Can be located between heap and stack. |
+| Heap                | Variable, grows upward          | Dynamically allocated memory (e.g., via `malloc`) during runtime. Starts after BSS/data segments and grows towards higher addresses. |
+| BSS Segment         | Variable                        | Uninitialized data initialized to zero by the kernel at start time.          |
+| Data Segment        | Variable                        | Initialized global and static variables.                                    |
+| Text Segment        | 0x08048000 (example start)      | Executable instructions of the process. Typically read-only.                |
+| Reserved            | 0x00000000 - 0x08047FFF         | Reserved by the system, including the null pointer dereference protection.  |
+
+This table simplifies the layout and doesn't account for various system-specific or architecture-specific differences, such as the use of Address Space Layout Randomization (ASLR) which randomizes the starting addresses of some segments to mitigate certain types of security vulnerabilities. Also, in 64-bit systems, the address space and the kernel/user space split will differ significantly due to the much larger addressable memory space.
 
 ## Kernel Space
 The kernel space in the user process map is inaccessible to the process. It is mapped into every process's address space to facilitate efficient transitions from user mode to kernel mode. It contains the following:
