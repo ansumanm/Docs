@@ -1,4 +1,7 @@
 # Table of contents
+1. [System bootup process](system-bootup-process)
+2. [Hardware detection process](hardware-detection-process)
+   
 # System bootup process
   - **Power-on and Initial Startup:**
     - When a computer is powered on, the CPU is reset and starts executing instructions from a predefined memory address. For traditional BIOS systems,
