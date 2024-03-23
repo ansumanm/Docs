@@ -3,6 +3,7 @@
 2. [Hardware detection process](hardware-detection-process)
 3. [*/proc* file system](#proc-file-system)
 4. [*/sys* file system](#sys-file-system)
+5. [Kerne space](kernel-space)
    
 # System bootup process
   - **Power-on and Initial Startup:**
@@ -95,3 +96,69 @@ Shows the various bus types and supports actions like scanning for new devices o
   Prefer */proc* for accessing information related to the kernel's view of processes, or for adjusting certain kernel parameters that affects the system's operation but not directly tied to specific devices or drivers.
 - ## For Hardware and Device Info:
   Use */sys* for tasks that involve direct interaction with hardware devices or when you need to read or modify device attributes. Sysfs's structured layout and device-centric approach make it ideal for managing hardware components and their drivers.
+
+# Process virtual memory map
++------------------+ <- 0xFFFFFFFF
+|     Kernel       |
+|     Space        |
++------------------+ 0xC0000000 (Example)
+|                  |
+|    Stack         | <- Grows downward
+|                  |
++------------------+ <- 0xBFFFFFFF
+|    Mapped        |
+|    Region        | (for shared libraries or explicit memory mappings)
++------------------+ 
+|                  |
+|                  |
+|    Heap          | <- Grows upward
+|                  |
++------------------+ 
+|    BSS Segment   | (Block Started by Symbol: Uninitialized Data)
++------------------+
+|    Data Segment  | (Initialized Data)
++------------------+
+|    Text Segment  | (Executable Code)
++------------------+ <- 0x00000000
+
+## Kernel Space
+The kernel space in the user process map is inaccessible to the process. It is mapped into every process's address space to facilitate efficient transitions from user mode to kernel mode. It contains the following:
+-   ### Kernel code and data
+  This includes the executable binary code of the kernel, global variables, kernel functions and kernel modules.
+-   ### System call handlers
+  The entry point for system calls made by the processes. These handlers facilitate the execution of the kernel services on behalf of user processes.
+-   ### Device drivers
+  Code that manages hardware devices.
+-   ### Memory management structures
+  Structures such as page tables, which the kernel uses to manage both physical and virtual memory of the system.
+-   ### Kernel stacks
+  Each process has a kernel-mode stack in the kernel space. This stack is used when the process executes in kernel mode, separate from the user-mode stack.
+-   ### Process and Scheduler Information
+  Information about processes and threads, including task structs, scheduling queues and other metadata that the kernel scheduler uses to manage process execution.
+-   ### File system cache and buffers
+  Buffers and caches for file systems to improve the performance of disk operations.
+-   ### Network Buffers and structures
+  Similar to file system buffers but for network operations.
+-   ### Inter-process Communication Mechanisms
+  Kernel space structures for IPC mechanisms like pipes, message queues, semaphores and shared memory.
+-   ### Security and access control data
+  Data structures that enforce security policies, including user credentials associated with processes, access rights and crypt keys for secure communication.
+
+### Kernel Stack
+The kernel stack is specifically used when the process operates in kernel mode, such as during system calls, interrupts and exceptions.This separation ensures that kernel operations have a dedicated, protected space for execution independent of the user-space environment.
+
+#### Key Aspects of the Kernel stack
+- **Dedicated Space:** Each process or thread has its own kernel stack, which is relatively small compared to the user-space stack. The stack is used exclusively for operations that occur while the process in in kernel mode.
+- **Security and Stability:** By isolating the kernel stack from user space, the operating system protects sensitive kernel data and operations from user-space errors or malicious activities, enhancing system security and stability.
+- **Context Switching:** The kernel stack plays a crucial role during context switches between processes. When the scheduler decides to switch the CPU from running one process to another, it uses the kernel stack to store the state of the process being switched out(if it's in kernel mode) and to restore the state of the process being switched in.
+
+#### When is the Kernel Stack used?
+- **System calls:** When a user process requests a service from the kernel via a system call, the transition from user mode to kernel mode involves switching to use the process's kernel stack. The kernel stack stores the parameters of the system call, return address and local variables needed by the kernel to service the request.
+- **Interrupt handling:** Upon receiving a hardware interrupt, the CPU switches to kernel mode to execute the interrupt service routine (ISR). The ISR uses the kernel stack of the current process to store its execution context and any temporary data.
+- **Exceptions and Faults:** When an exception -- like page fault, division by zero -- occurs while a process is executing, the handling of this exception by the kernel uses the kernel stack to maintain the context of the operation and to manage recovery or error reporting.
+- **Kernel threads:** which are thread of execution entirely within kernel space use kernel stacks for their operations, independent of any user process.
+
+#### Characteristics
+- **Size:** Kernel stacks are typically fixed in size and are relatively small. For instance, on Linux, the default size might be a few KB which is usually sufficient for kernel mode operation, but requires careful management to avoid stack overflow.
+- **Allocation:** The kernel stack is allocated when the process or thread is created and dellocated when it terminates. The allocation is managed by the kernel's memory management subsystem.
+  
