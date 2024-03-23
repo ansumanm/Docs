@@ -5,6 +5,7 @@
 4. [*/sys* file system](#sys-file-system)
 5. [Process virtual memory map](#process-virtual-memory-map)
 6. [Kernel space](#kernel-space)
+7. [OS scheduling](#os-scheduling)
    
 # System bootup process
   - **Power-on and Initial Startup:**
@@ -155,3 +156,24 @@ The kernel stack is specifically used when the process operates in kernel mode, 
 - **Size:** Kernel stacks are typically fixed in size and are relatively small. For instance, on Linux, the default size might be a few KB which is usually sufficient for kernel mode operation, but requires careful management to avoid stack overflow.
 - **Allocation:** The kernel stack is allocated when the process or thread is created and dellocated when it terminates. The allocation is managed by the kernel's memory management subsystem.
   
+# OS scheduling
+A hardware timer interrupt is commonly used. This timer interrupt allows the operating system's scheduler to perform regular and timely assessments of the running processes and make decisions about context switching, process prioritization, and load balancing among CPUs in multicore systems.
+
+## Hardware Timer Interrupt
+### Function:
+-   Generates interrupts at regular, predefined intervals. When the operating system initializes, it configures this timer to interrupt the CPU after a specific period- this period is open referred to as a ***tick***.
+### Usage in scheduling:
+-   Each time a timer interrupt occurs, the ISR associated with the timer is executed. This mechanism is central to implementing time-sharing systems, allowing multiple processes to run "simulatneously" by giving each a slice of CPU time.
+### Premptive Multitasking:
+In preemptive multitasking environments, the timer interrupt enables the OS to preempt the currently running process if its allocated t ime slice has expired, ensuring that no single procecss monopolizes the CPU.
+### Platform specific implementations:
+#### x86 Architecture:
+Uses the Programmable Interval Timer (PIT), Local APIC timers or High Precision Event Timer (HPET) for generating periodic interrupts.
+#### ARM Architecture:
+Uses system timers provided by the ARM architecture.
+### Modern Enhancements
+#### Tickless kernels:
+Modern operating systems have been moving towards *tickless* or *dynamic ticking* kernels, which reduce or eliminate unnecessary timer interrupts during periods of inactivity. This approach conserves power and reduces interrupt overhead, which is particularly beneficial in mobile and embedded systems.
+#### High-Resolution Timers:
+Operating systems also use high-resolution timers to support applications that require precise timing beyond the basic scheduling tick. These are typically implemented using different hardware timers that can be programmed to generate interrupts at very fine-grained intervals.
+
