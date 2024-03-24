@@ -489,3 +489,80 @@ The IPv6 header format is designed to be simpler and more efficient than its IPv
 | Destination Address            | 128         | The 128-bit address of the intended recipient of the packet.                                                                                                |
 
 Unlike the IPv4 header, the IPv6 header does not include fields for header checksum, fragment offset, or flags for fragmentation. Instead, IPv6 handles fragmentation in the sending host, and for options that need to be communicated, IPv6 utilizes extension headers that follow the initial header and are identified by the "Next Header" field. This streamlined approach aims to facilitate faster processing by routers and support the expansive addressing and routing capabilities required for the modern internet.
+
+# Linux Sockets
+## Packet Sockets
+**Packet Sockets**, provided by Linux kernel, are specifically designed for direct interaction with Layer 2 packets. Using the socket() system call with **AF_PACKET** as the socket family, an application can send and receive Ethernet frames directly.
+Example:
+```c
+int sockfd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+```
+- **AF_PACKET**: Specifies the address family used for packet sockets, allowing direct access to protocol layers.
+- **SOCK_RAW**: Indicates raw network protocol access.
+- **htons(ETH_P_ALL)**: Specifies that all protocols are received(Ethernet frames), making the socket protocol-agnostic and capable of receiving all Layer 2 packets.
+
+## Raw Sockets
+
+To receive ICMP (Internet Control Message Protocol) packets using sockets, you can use raw sockets in Linux. Raw sockets allow you to receive and send packets at the IP layer, bypassing the higher-level protocols like TCP or UDP. This capability is particularly useful for implementing custom network protocols, network utilities, or handling ICMP packets, which are used for diagnostic or control purposes (e.g., ping, traceroute).
+
+Here’s a basic example in C on how to create a raw socket to receive ICMP packets:
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
+int main() {
+    int sockfd;
+    char buffer[1024];
+    struct sockaddr_in src_addr;
+    socklen_t addr_len;
+
+    // Creating a raw socket to receive all packets (IPPROTO_ICMP for ICMP packets)
+    sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+    if (sockfd < 0) {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Optional: Bind to a specific interface
+    //memset(&src_addr, 0, sizeof(src_addr));
+    //src_addr.sin_family = AF_INET;
+    //src_addr.sin_addr.s_addr = inet_addr("YOUR_INTERFACE_IP");
+    //if (bind(sockfd, (struct sockaddr *)&src_addr, sizeof(src_addr)) < 0) {
+    //    perror("Bind failed");
+    //    exit(EXIT_FAILURE);
+    //}
+
+    printf("Receiving ICMP packets...\n");
+    while (1) {
+        // Receive packets
+        ssize_t packet_len = recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&src_addr, &addr_len);
+        if (packet_len < 0) {
+            perror("Packet receive failed");
+        } else {
+            printf("Received ICMP packet. Length: %zd bytes\n", packet_len);
+            // Process the packet here (optional)
+        }
+    }
+
+    close(sockfd);
+    return 0;
+}
+```
+
+### Key Points:
+- **Socket Creation:** `socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)` creates a raw socket that receives ICMP packets. `AF_INET` specifies the IPv4 protocol, `SOCK_RAW` allows raw network protocol access, and `IPPROTO_ICMP` specifies the ICMP protocol.
+
+- **Receive Packets:** `recvfrom()` is used to receive packets from the socket. The function fills the buffer with the received packet data and provides the source address.
+
+- **Execution and Privileges:** Running this program requires root privileges because creating raw sockets is restricted to privileged users due to security reasons. You can execute this program with `sudo` or as the root user.
+
+- **Binding to an Interface:** The example above optionally includes code (commented out) to bind the socket to a specific IP address/interface. This step is not required but can be used if you want to receive ICMP packets on a specific interface.
+
+This example demonstrates the basics of receiving ICMP packets. In a real application, you would likely include additional error checking and possibly parse the ICMP message contents based on the ICMP packet structure.
