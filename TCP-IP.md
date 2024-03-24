@@ -19,6 +19,8 @@
 18. [IP header flags](#ip-header-flags)
 19. [IP header options](#ip-header-options)
 20. [IP fragmentation](#ip-fragmentation)
+21. [IPv6 Address](#ipv6-address)
+22. [IPv6 Header](#ipv6-header)
 
 ## TCP header
 
@@ -446,3 +448,44 @@ The following fields of the IP header are used in fragmentation
     If an IP packet is 4000 bytes long, and has to pass through a network with an MTU of 1500 bytes, excluding the header (assuming 20 bytes of IP header) each fragment can carry up to 1480 bytes of the original packet's data.
       - The first fragment would have a Fragment Offset of 0.
       - The second fragment would carry the next portion of the data. Its Fragment Offset would be 185 (1480/8), indicating that the data starts at byte 1480 of the original packet.
+
+## IPv6 Address
+### Length
+128 bits
+### Representation
+IPv6 addresses are represented as eight groups of four hexadecimal digits, each group representing 16 bite. The groups are separated by *:*. 
+For example: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+### Zero Compression
+IPv6 allows for the omission of leading zeroes within any 16-bit block and the replacement of one or more consecutive all-zero blocks with a double colon (::).
+However, the double colon can appear only once in an address to prevent ambiguity.
+For example: 2001:db8:85a3::8a2e:370:7334
+
+### Types of IPv6 addresses
+#### Unicast Address
+Indentify a single interface. A packet sent to a unicast address is delivered to the interface identified by that address.
+-  **Global Unicast Address (GUA):** Similar to public IPv4 addresses.
+-  **Link-Local Unicast Address:** Used for communication within a single network segment. They are not routable beyond their local link and have a prefix of fe80::/10
+-  **Unique Local Addresses(ULA):** Similar to IPv4's private range addresses, meant for local communication withing a site or between a limited set of sites, with a prefix fc00::/7
+
+#### Multicast Addresses: 
+Represent a group of interfaces, potentially on different nodes. A packet sent to a multicast address is delivered to all interfaces identified by that address.
+Identified by the prefixL ff00::/8
+
+#### Anycast Addresses:
+Assigned to multiple interfaces(usually on different nodes), but a packet sent to anycast address is delivered to nearest interface.
+
+## IPv6 Header
+The IPv6 header format is designed to be simpler and more efficient than its IPv4 counterpart. Here's a summary of the IPv6 header fields in a tabular format:
+
+| Field                          | Size (Bits) | Description                                                                                                                                               |
+|--------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Version                        | 4           | Indicates the version of IP being used. For IPv6, this is set to 6.                                                                                       |
+| Traffic Class                  | 8           | Used to differentiate packets within the network, providing similar functionality to the Type of Service (ToS) field in IPv4.                             |
+| Flow Label                     | 20          | Used for labeling sequences of packets that require special handling by intermediate routers, aimed at providing quality of service (QoS) features.       |
+| Payload Length                 | 16          | Specifies the size of the payload (including any extension headers) in bytes. The maximum payload size is 65,535 bytes, but a larger payload is possible using the Jumbo Payload option. |
+| Next Header                    | 8           | Identifies the type of header immediately following the IPv6 header. This field can indicate transport layer protocols (e.g., TCP, UDP) or other extension headers. |
+| Hop Limit                      | 8           | Replaces the TTL field in IPv4, determining the maximum number of hops (routers) that the packet is allowed to pass through before being discarded.       |
+| Source Address                 | 128         | The 128-bit address of the originator of the packet.                                                                                                       |
+| Destination Address            | 128         | The 128-bit address of the intended recipient of the packet.                                                                                                |
+
+Unlike the IPv4 header, the IPv6 header does not include fields for header checksum, fragment offset, or flags for fragmentation. Instead, IPv6 handles fragmentation in the sending host, and for options that need to be communicated, IPv6 utilizes extension headers that follow the initial header and are identified by the "Next Header" field. This streamlined approach aims to facilitate faster processing by routers and support the expansive addressing and routing capabilities required for the modern internet.
