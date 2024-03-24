@@ -23,5 +23,6 @@ For TCP/UDP packets, the checksum field in the TCP/UDP header has to be updated 
 -  A static route is added in the oVRF to forward all public traffic to vInt2. This can also be achieved by ABF. THe vInt2 is assigned to the NAT44 service instance.
 -  After the packet from public network reaches the NAT44 instance, the NAT44 DB is checked for an entry for the destination address. If found, the destination address/port is replaced with the private address/port and then forward via the private interface which is found out by destination address lookup on iVRF.
 -  The Checksum in the TCP/UDP header is updated before sending the packet out.
--  
+
+
 ![Nat44](https://github.com/ansumanm/Docs/blob/master/nat44.png "Nat44")
