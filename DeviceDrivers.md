@@ -6,6 +6,7 @@
 5. [Process virtual memory map](#process-virtual-memory-map)
 6. [Kernel space](#kernel-space)
 7. [OS scheduling](#os-scheduling)
+8. [Linux system calls](#linux-system-calls)
    
 # System bootup process
   - **Power-on and Initial Startup:**
