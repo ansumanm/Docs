@@ -177,3 +177,29 @@ Modern operating systems have been moving towards *tickless* or *dynamic ticking
 #### High-Resolution Timers:
 Operating systems also use high-resolution timers to support applications that require precise timing beyond the basic scheduling tick. These are typically implemented using different hardware timers that can be programmed to generate interrupts at very fine-grained intervals.
 
+# Linux System Calls
+
+Here's a table summarizing some fundamental Linux system calls and their purposes. System calls provide the primary interface between user-space applications and the kernel, allowing programs to request various services, such as file operations, process management, and communication.
+
+| System Call    | Description                                                                                                                                                 |
+|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `open()`       | Opens a file or device, returning a file descriptor that can be used in subsequent operations like `read()`, `write()`, and `close()`.                      |
+| `read()`       | Reads data from an open file or device into a buffer. The amount of data read is specified by the caller.                                                  |
+| `write()`      | Writes data from a buffer to an open file or device. The amount of data written is specified by the caller.                                                |
+| `close()`      | Closes an open file descriptor, freeing up resources associated with it.                                                                                    |
+| `fork()`       | Creates a new process by duplicating the calling process. The new process is referred to as the child process.                                             |
+| `exec()`       | Replaces the current process image with a new process image, specified by a file path. This family of functions includes `execl()`, `execp()`, and others.|
+| `wait()`       | Waits for a child process to change state, usually to finish execution. It's used for process synchronization.                                             |
+| `exit()`       | Terminates the calling process and returns an exit status to the operating system.                                                                         |
+| `socket()`     | Creates a socket descriptor, specifying the communication domain (e.g., IPv4, IPv6), type (e.g., stream, datagram), and protocol.                          |
+| `bind()`       | Binds a socket to a local address and port number, necessary for servers to receive connections on a specified port.                                       |
+| `listen()`     | Marks a socket as a passive socket that will be used to accept incoming connection requests using `accept()`.                                              |
+| `accept()`     | Blocks the caller until a connection request arrives on a listening socket, then returns a new socket descriptor for the connection.                       |
+| `connect()`    | Initiates a connection on a socket, used by clients to establish a connection with a server.                                                               |
+| `send()`       | Sends data on a connected socket. It's part of a set of functions, including `sendto()` and `sendmsg()`, for various use cases.                            |
+| `recv()`       | Receives data from a connected socket. Similar to `send()`, there are related functions like `recvfrom()` and `recvmsg()` for different contexts.           |
+| `mmap()`       | Maps files or devices into memory, providing a method for applications to access files or devices as if they were in memory.                               |
+| `munmap()`     | Unmaps a previously mapped memory area, typically used after finishing with the memory area provided by `mmap()`.                                          |
+| `ioctl()`      | Provides device-specific input/output operations that don’t fit the regular system call semantics, like controlling non-data operations of a device.        |
+
+These system calls enable fundamental operations necessary for the execution and management of processes, handling of files and devices, and network communication in Linux-based systems.
