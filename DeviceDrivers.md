@@ -204,3 +204,34 @@ Here's a table summarizing some fundamental Linux system calls and their purpose
 | `ioctl()`      | Provides device-specific input/output operations that don’t fit the regular system call semantics, like controlling non-data operations of a device.        |
 
 These system calls enable fundamental operations necessary for the execution and management of processes, handling of files and devices, and network communication in Linux-based systems.
+
+# Thread-safe function
+Making a function thread-safe means ensuring that it can be safely called from multiple threads simultaneously withoug causing data corruption or inconsistent results.
+-   **Avoid shared state:** Use only local variables withing the function.
+-   **Immutable shared state:** If shared data does not change, multiple threads can safely read it withouh synchronization.
+-   **Synchronization mechanisms:**
+   - ***Mutexes and Locks:*** Use mutexes to synchronize access to shared resources. A thread acquires the mutex before accessing the shared resource and releases it afterwards.
+   - ***Reader-Writer Locks:*** If your function frequently reads but infrequently writes to a shared resource, consider using reader-writer locks. They allow multiple readers simultaneous access but require exclusive access for writing.
+   - ***Atomic operations:*** For simple data  types, use atomic operations to read, write, increment or compare-and-swap without needing explicit locks.
+   - ***Condition Variables:*** Use condition variables in conjuction with mutexes for scenarios where a thread needs to wait for a certain condition before proceeding.
+-   **Thread-local Storage**
+     Use TLS to provide each thread with its own instance of a variable. TLS variables are global but are instantiated separately for each thread.
+    Ex- __thread int thread_local_variable;
+-   **Reentrancy**
+     - ***Make functions reentrant:***  A reentrant function does not hold an static or global non-constant data, does not return a pointer to a static data and only calls reentrant functions.
+
+# Pthread synchronization
+
+Here's a table summarizing the different pthread features used for thread synchronization, along with a brief description of each:
+
+| Feature                   | Description                                                                                                                                   |
+|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| Mutex (pthread_mutex_t)   | Mutual exclusion object that prevents multiple threads from executing critical sections of code that access shared data concurrently.         |
+| Recursive Mutex           | A special type of mutex that can be locked multiple times by the same thread without causing a deadlock.                                      |
+| Spinlock (pthread_spinlock_t) | A lock that causes a thread trying to acquire it to simply wait in a loop ("spin") while repeatedly checking if the lock is available.        |
+| Read-Write Lock (pthread_rwlock_t) | Allows concurrent access for read-only operations, while write operations require exclusive access.                                          |
+| Condition Variable (pthread_cond_t) | Allows threads to suspend execution and relinquish the processor until some condition is true. Typically used with a mutex.                 |
+| Barrier (pthread_barrier_t) | A synchronization mechanism that blocks a set of threads until all threads have reached a certain point in their execution.                   |
+| Semaphore (POSIX sem_t)    | Not a pthread feature per se, but POSIX semaphores can be used in pthreads-based applications for counting-based synchronization.            |
+
+Each of these synchronization features serves different use cases and scenarios in multithreaded programming, providing a robust set of tools for managing concurrent execution and access to shared resources in pthreads-based applications.
