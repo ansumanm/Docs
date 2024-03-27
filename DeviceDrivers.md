@@ -7,6 +7,7 @@
 6. [Kernel space](#kernel-space)
 7. [OS scheduling](#os-scheduling)
 8. [Linux system calls](#linux-system-calls)
+9. [Linux device driver](#linux-device-driver)
    
 # System bootup process
   - **Power-on and Initial Startup:**
@@ -235,3 +236,42 @@ Here's a table summarizing the different pthread features used for thread synchr
 | Semaphore (POSIX sem_t)    | Not a pthread feature per se, but POSIX semaphores can be used in pthreads-based applications for counting-based synchronization.            |
 
 Each of these synchronization features serves different use cases and scenarios in multithreaded programming, providing a robust set of tools for managing concurrent execution and access to shared resources in pthreads-based applications.
+
+# Linux device driver
+## Driver and Device Registration
+### PCI registration
+The driver must register itself with the PCI subsystem, providing a table of device IDs it supports.Functions for probing (initializing a device upon detection) and removing (cleanup when a device is removed or the driver is unloaded) are specified here.
+### Network Device Registration
+Within the probe function, after successful PCI-specific initialization, a network device instance (**struct net_device**) is allocated and registered with the networking subsystem. The structure presents the Ethernet interface to the kernel.
+
+## Initialization and Configuration
+### PCI device initialization:
+In the probe function, the driver enables the PCI device, requests the necessary I/O and memory regions, sets up DMA parameters, and maps the device's registers into the kernel's address space.
+### Network Device Setup:
+The network device's operations (**netdev_ops**) are defined and assigned. These operations include open, close, start_xmit(transmission), change_mtu ..etc
+
+## Packet Transmission
+### Start Transmission (**start_xmit** function)
+This function is called by the networking subsystem when there's a packet ready to be sent. The driver must take the packet ( a **skb** or socket buffer), possibly map it for DMA, and initiate the transmission process according to the hardware's requirements.
+### Transmissin Complete
+Often handled in an interrupt service routine that responds to transmission complete interrupts from the hardware. The driver must clear the necessary flag, unmap the DMA and inform the kernel of the completeion.
+
+## Packet Reception
+### Reception process
+Typically the hardware interrupts the CPU when packets are received. The driver's ISR must then retreive the packets from the device, possibly involving DMA unmap operation, and pass them up to the networking stack.
+### Passing the packets to the stack
+Received packets are wrapped into the **skb** structures and handed to the kernel using netif_rx() or similar functions. The driver must also manage receive buffers and notify the hardware to be ready for more packets.
+
+## Interrupt Handling
+### Interrupt registration
+The driver registers an ISR with the kernel to handle hardware interrupts. The ISR will deal with both transmission and receiption notifications along with any errors and status interrupts from the device.
+
+## Teardown and cleanup
+### Device shutdown
+Operations to stop the device's network activity, usually implemented in the network device's **stop** function. This includes disabling the interrupts, stopping DMA and putting the hardware into a low-powered state if needed.
+### Driver unloading
+When the driver is removed, it must unregister the network device, release requested resources (I/O memory. DMA buffers etc), unmap device memory and perform any additionah hardware specific cleanup.
+
+## Supporting structures and functions
+### Private data structures
+Drivers often define a structure to hold device specific information. This is attached to the **net_device** structure via a **priv* field.
