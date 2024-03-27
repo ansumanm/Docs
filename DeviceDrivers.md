@@ -333,3 +333,24 @@ The specific ISR registered for the interrupting device is then called. This fun
 If the ISR defers processing to a softer mechanish, this might not appear in the ISR's stack trace directly but would be part of a separate stack trace for the softirq, tasklet or the workqueue handler.
 ### Return from Interrupt
 Finally, the trace includes the return from interrupt handling, restoring the state to continue execution of the task that was interrupted.
+
+## How it works
+### Hardware trigger
+A hardware event triggers an interrupt signal to the CPU
+### CPU response
+The CPU responds by temporarily halting the current execution flow (either user-space code or kernel-space code) and jumps into a predifined address in memory where the interrupt handling code begins. This address is setup during the system's initialization phase and points to the interrupt entry point.
+### Interrupt entry point execution
+The code at interrupt entry point performs several critical functions
+#### Saving state
+It saves the state of the currently executing process or kernel thread to ensure it can be resumed later without loss of data or corruption. This typically involves saving registers and other CPU state information.
+#### Switching Stacks
+If necessary, it switches from user stack to kernel stack.
+
+#### Acknowledging the interrupt
+The interrupt has to be acknowledged to the hardware.
+
+#### Determining the Source
+If identifies the source of the interrupt to dispatch the handling to the correct ISR.
+
+### Dispatch to ISR
+Once the initial handling is complete, the system dispatches control to the specific ISR.
