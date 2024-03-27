@@ -8,6 +8,8 @@
 7. [OS scheduling](#os-scheduling)
 8. [Linux system calls](#linux-system-calls)
 9. [Linux device driver](#linux-device-driver)
+10. [Kernel Address space](#kernel-address-space)
+11. [ISR Context](#isr-context)
    
 # System bootup process
   - **Power-on and Initial Startup:**
@@ -275,3 +277,59 @@ When the driver is removed, it must unregister the network device, release reque
 ## Supporting structures and functions
 ### Private data structures
 Drivers often define a structure to hold device specific information. This is attached to the **net_device** structure via a **priv* field.
+
+# Kernel Address space
+## Kernel Threads
+### Definition
+Kernel threads are processes that run entirely in kernel space. They do not have a user-space context, which distinguishes them from a regular processes that operate in both user space and kernel space. Kernel threads are used by kernel to perform various background tasks.
+### Purpose
+These threads are primarily used for tasks that need to be executed outside the context of user processes or need to run asynchronously in the background. Examples include managing I/O, handling system calls etc..
+### Characteristics
+-   Kernel threads run in privileged mode with full access to the kernel space.
+-   They do not interact with the user space directly, although they may handle tasks on behalf of user processes or manage system resources that user processes depend on.
+-   They are scheduled and managed by the kernel's scheduler just like user processes.
+
+## Creation and Management
+### kthread
+The Linux kernel provides mechanisms for creating and managing kernel threads, such as the kthread_create() function and related APIs.
+### Workqueues
+For tasks that do not require a dedicated thread, but need to be processed in kernel context, the kernel can use work queues. Work is queued up and executed by worker threads managed by the kernel.
+
+## Examples of Kernel Threads
+### ksoftirqd
+These are per-CPU threads responsible for executing softirqs which are software interrupts used for a variety of tasks, including network packet processing and block device I/O.
+### kworker
+Generic worker threads for executing deferred work.  The work could be anything that the kernel needs to do asynchronously in the background.
+### kswapd
+A thread responsible for managing memory swappingg and page-out operations to free up memory.
+
+## Key Points
+### Shared Kernel Address space
+All kernel threads- and any kernel-mode execution of regular processes- operate in the same kernel address space. This is a critical aspect of how Linux manages memory and executes code in a protected and efficient manner.
+### Single Execution Mode
+When you consider a task a kernel thread or process, when its executing in kernel space, it is running in kernel mode with full access to moemry and hardware resources.The key distinction from user processes is that kernel tasks do not switch back to user mode.
+### Management and Scheduling
+The Linux kernel scheduler manages both the user processes and kernel threads without distinguishing between them based on where they execute code. The scheduler's primary concerns are priority, fairness and effective use of CPU resources.
+
+# ISR Context
+Interrupt Service Routines are executed in a special context known as interrupt context.
+The context is distinct from both user context and the regular kernel context for a few reasons:
+## Premption and Blocking: 
+ISRs are designed to run to completion without being preempted. They run at a high priority and are expected to be fast and non-blocking as they cannot sleep or wait on locks that might not be immediately available.
+## No specific process
+An ISR does not run on behalf of a specific process. It executes directly in response to a hardware interrupt, handling tasks such as acknowledging the interrupt at the hardware level, performing minimal necessary processing and deffering an longer processing to be handled later in a safer context, like a kernel thread(often using softirqs, tasklets or workqueues for this deferred processing).
+## Memory management restrictions
+Given the high priority premptive nature of the ISRs, certain kernel functions, especially thouse that might block or manupulate process-specific resources are off-limits in this context.
+## Stack usage
+ISRs use the stack of the currently running task(process or kernel thread) but have a very limited stack space.  Kernel stack is typically much smaller than user space stack (around 16KB)
+## ISR Stack Trace
+### Entry Point
+On x86 systems, the interrupt entry point is defined in the Interrupt Descriptor table (IDT).Each entry in the IDP corresponds to a interrupt vector and points to the entry point for handling that interrupt.
+### Common interrupt handling code
+After the initial architecture specific handling, the trace moves into more generic kernel code and manages interrupts. This might include functions like **handle_IRQ** or **do_IRQ**
+### Specific ISR
+The specific ISR registered for the interrupting device is then called. This function is the main part of the ISR and is responsible for acknowledging the interrupt at  the hardware level and performing and immediate actions required.
+### Softirq/tasklet/workqueue handlers:
+If the ISR defers processing to a softer mechanish, this might not appear in the ISR's stack trace directly but would be part of a separate stack trace for the softirq, tasklet or the workqueue handler.
+### Return from Interrupt
+Finally, the trace includes the return from interrupt handling, restoring the state to continue execution of the task that was interrupted.
