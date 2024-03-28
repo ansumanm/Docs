@@ -104,3 +104,21 @@ QEMU can emulate network interfaces for VMs and also supports bridged networking
 
 ### Graphics and Input/Output:
 QEMU provides virtual graphics adapters and input/output devices for VMs, allowing users to interact with their VMs using standard peripherals like keyboards, mice and monitoprs.
+
+# VMs vs Containers
+Here's a table summarizing the key differences between Virtual Machines (VMs) and Containers:
+
+| Feature                  | Virtual Machines (VMs)                          | Containers                            |
+|--------------------------|-------------------------------------------------|---------------------------------------|
+| Virtualization Level     | Hardware-level virtualization                   | Operating system-level virtualization |
+| Isolation                | Complete isolation between VMs                  | Isolated from each other but share the host OS kernel |
+| Resource Requirements    | Higher (full OS plus virtual hardware per VM)   | Lower (share host OS, smaller footprint) |
+| Startup Time             | Longer (involves booting an OS)                 | Faster (no OS to boot, starts application directly) |
+| Portability              | Less portable (tied to hypervisor)              | Highly portable (encapsulates application and its dependencies) |
+| Use Cases                | Ideal for applications needing full OS, specific resource allocations, or hardware-level isolation | Suited for microservices, scalable applications, development/testing environments |
+| Operating System         | Each VM runs its own OS                         | Containers on the same host share the host's OS kernel |
+| Density                  | Lower (due to resource requirements of each VM) | Higher (due to shared OS and lower resource requirements) |
+| Management               | Managed per VM (each VM is an isolated environment) | Managed as a set of interrelated containers running on a single OS |
+| Security                 | Strong isolation can lead to higher security    | Security depends on kernel isolation features; less isolated than VMs |
+
+This table highlights the fundamental differences and typical use cases for VMs and Containers, helping you choose the right technology based on your specific requirements.
