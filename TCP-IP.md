@@ -1,4 +1,5 @@
 # Table of contents
+
 1. [TCP header](#tcp-header)
 2. [Retransmission](#retransmission-of-missing-data----automatic-repeat-request-arq)
 3. [Congestion Control](#congestion-control)
@@ -40,23 +41,29 @@
 | Options (if any)         | Variable    |
 
 ### Source and Destination Port
+
 Used to identify the endpoints within the source and destination machines
 
 ### Sequence Number(32) bits
+
 Used for data sequencing. If the SYN flag is set, this is the initial sequence number.
 The sequence number of the actual first data byte and the subsequent ones are used for data ordering, reassembly and loss recovery.
 
 ### Acknowledgement Number (32 bits)
+
 If the ACK flag is set, the value of this field is the next sequence number that the sender of the packet is expecting.
 This acknowledges the reciept of all prior bytes.
 
 ### Data Offset (Header Length)
+
 Indicates the length of the TCP header in 32-bit words. It is needed because Optional fields might vary in length.
 
 ### Reserved (6 bits)
+
 Should be set to 0
 
 ### Flags (6 bits)
+
 | Flag | Name               | Description                                                                                             | Use Case                                                                                     |
 |------|--------------------|---------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
 | URG  | Urgent             | Indicates that the Urgent pointer field is significant and that data should be processed immediately.  | Used for data that should be prioritized, such as interrupts or immediate action requests.   |
@@ -66,15 +73,18 @@ Should be set to 0
 | SYN  | Synchronize        | Used during the initial connection setup phase to synchronize sequence numbers.                        | Critical for establishing a TCP connection, initiating sequence number synchronization.     |
 | FIN  | Finish             | Indicates that the sender has finished sending data and wishes to terminate the connection.           | Used to gracefully close a TCP connection after the data transfer is complete.               |
 
-
 ### Window Size (16 bits)
-#### Flow Control:
+
+#### Flow Control
+
 The size of the sender's receive window(or buffer space available), which controls the flow of data to prevent a receiver from being overwhelmed by too much data at once.
 
 ### Checksum (16 bits)
+
 Used for error-checking of the header and data. It's calculated by the sender and verified by the receiver to ensure data integrity.
 
 This is how checksum is calculated:-
+
 1. A pseudo header is constructed
 
 #### IPv4 Pseudo Header Format
@@ -97,62 +107,92 @@ This is how checksum is calculated:-
 | Zeros              | 24           | Reserved for future use, set to zero.               |
 | Next Header        | 8            | Identifies the protocol used (TCP is represented as 6).|
 
-2. **Preparation for Checksum Calculation**
+**Preparation for Checksum Calculation**:
 The pseudo header, the TCP header, and the TCP data are arranged in a sequence of 16-bit words for the purpose of checksum calculation.
 
-3. **Checksum Computation**: The checksum algorithm sums all 16-bit words using 1's complement arithmetic. The sum itself is also represented as a 16-bit word and its 1's complement is taken to producte the final checksum value.
+**Checksum Computation**:
+The checksum algorithm sums all 16-bit words using 1's complement arithmetic. The sum itself is also represented as a 16-bit word and its 1's complement is taken to producte the final checksum value.
 
 ### Urgent Pointer (16 bits)
+
 If the URG flag is set, this 16-bit field is an offset from the sequence number indicating the last urgent data byte.
 
-### Options (variable):
+### Options (variable)
+
 The length of this field is determined by the data offset field. Options can control various aspects of the TCP connection, like maximum segment size, window scaling, selective acknowledgement etc...
 
 ## Retransmission of missing data -- Automatic Repeat reQuest (ARQ)
+
 The process involves use of acknowledgements (ACKs) and timers.
-### Positive Acknowledgement with Retransmission(PAR):
+
+### Positive Acknowledgement with Retransmission(PAR)
+
 Each TCP segment is acknowledged by the receiver. If the sender doesn't receive an ACK for a particular segment within a certain time frame, it assumes that the segment was lost or corrupted and retransmits it.
-### Selective Acknowledgements(SACK):
+
+### Selective Acknowledgements(SACK)
+
 The receiver informs the sender about all the segments that have been received successfully. This way, the sender only needs to transmit the segments that have not been acknowledged, rather than transmitting all segments following a missing segment.
+
 ### Timers
-#### Retransmission Timer:
+
+#### Retransmission Timer
+
 Each time a segment is sent, a retransmission timer is started for a segment. If the timer expires before an acknowldegement is received, the segment is retransmitted.
-#### Exponential Backoff:
+
+#### Exponential Backoff
+
 To manage congestion and to avoid overwhelming the network or the receiver, the restransmission timer is often set to double after each consecutive timeout for the same segment, up to a certain limit.
+
 #### Fast Retransmission
+
 Another mechanism that triggers retransmission is the detection of three duplicate ACKs.
 If the sender receives three ACKs for the same data(indicating that the segment immediately following the acknowledged data has not been received), it does not wait for the retransmission timer to expire before restransmitting the missing segment.
 
 ## Congestion Control
-### Round Trip Time (RTT):
+
+### Round Trip Time (RTT)
+
 It represents the amount of time it takes for a data packet to travel from sender to the receiver and for an acknowledgement of that packet to return to the sender.
+
 ### Slow Start Phase
-#### Initialization:
+
+#### Initialization
+
 When a new TCP connection is established, Slow Start initializes the congestin window size **cwnd** to a small value, typically 1 or 2 segments.
-#### Exponential increment:
+
+#### Exponential increment
+
 Initially, congestion window (cwnd) = 1
 After 1 RTT, cwnd = 2^(1) = 2
 2 RTT, cwnd = 2^(2) = 4
 3 RTT, cwnd = 2^(3) = 8
 
 ### Congestion Avoidance Phase
+
 #### Additive increment
+
 This phase starts after the threshold value **ssthresh** for the cwnd is reached. After that for each RTT, cwnd = cwnd + 1
 
 ### Congestion Detection Phase
+
 #### Case 1: Retransmission due to Timeout
+
 In this case, the congestion possibility is high.
+
 - ssthresh is reduced to half of the current window size.
 - set cwnd = 1
 - start with the slow start phase again
 
-#### Case 2:
+#### Case 2
+
 Retransmission due to 3 Acknowledgement Duplicates - The congestion possibility is less.
+
 - ssthresh value reduces to half of the current window size.
 - set cwnd = ssthresh
 - start with the congestion avoidance phase.
 
 ## Setsockopt
+
 List of some common socket options that can be passed to `setsockopt()`, along with a brief description of each:
 
 | Level             | Option                       | Description                                                                                   |
@@ -184,23 +224,31 @@ List of some common socket options that can be passed to `setsockopt()`, along w
 This table provides an overview of some of the options you can set with `setsockopt()` to customize the behavior of your sockets in a POSIX environment.
 
 ## TCP Implementation Overview
-- ### Protocol registration:
+
+- ### Protocol registration
+
   TCP, like other network protocols in the Linux kernel, is registered in the networking subsystem using a protocol family-specific structure
   (**inet_connection_sofk_af_ops** for IPv4, for example). The registration process includes pointers to functions that handle various aspects of the protocol, such as socket creation, state transitions and data transmission/reception.
-- ### Socket Layer Integrations:
+
+- ### Socket Layer Integrations
+
   At user levet, applications interact with TCP through sockets using the socket API:-
-    - **socket()**
-    - **connect()**
-    - **listen()**
-    - **accept()**
-    - **send()**
-    - **recv()**
-- ### TCP Control Blocks:
+  - **socket()**
+  - **connect()**
+  - **listen()**
+  - **accept()**
+  - **send()**
+  - **recv()**
+
+- ### TCP Control Blocks
+
   The main data structures used to manage TCP connections are:-
-    - **sock(or socket)**: Represents and endpoint for communication.
-    - **inet_sock**: Inherits from **sock** and is used for IP-based sockets, adding fields specific to UP protocols like IP addresses and ports.
-    - **tcp_sock**: Further specializes inet_sock for TCP, containing TCP-specific information such as sequence numbers, window sizes and various flags indicating the state of the TCP connection.
-- ### TCP State Machine:
+  - **sock(or socket)**: Represents and endpoint for communication.
+  - **inet_sock**: Inherits from **sock** and is used for IP-based sockets, adding fields specific to UP protocols like IP addresses and ports.
+  - **tcp_sock**: Further specializes inet_sock for TCP, containing TCP-specific information such as sequence numbers, window sizes and various flags indicating the state of the TCP connection.
+
+- ### TCP State Machine
+
   Different states of TCP connection are
   - **LISTEN**
   - **SYN_SENT**
@@ -214,13 +262,101 @@ This table provides an overview of some of the options you can set with `setsock
   - **LAST_ACK**
   - **TIME_WAIT**
   - **BOUND**
-- ### Buffers and Queues:
+
+#### TCP Client state machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> CLOSED
+    CLOSED --> SYN_SENT : connect()
+    SYN_SENT --> ESTABLISHED : rcv SYN+ACK / send ACK
+    ESTABLISHED --> FIN_WAIT_1 : close()
+    FIN_WAIT_1 --> FIN_WAIT_2 : rcv ACK
+    FIN_WAIT_1 --> CLOSING : rcv FIN
+    CLOSING --> TIME_WAIT : rcv ACK
+    FIN_WAIT_2 --> TIME_WAIT : rcv FIN / send ACK
+    TIME_WAIT --> CLOSED : timeout (2MSL)
+```
+
+#### TCP Server state machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> CLOSED
+    CLOSED --> LISTEN : socket(), bind(), listen()
+    LISTEN --> SYN_RECEIVED : rcv SYN / send SYN+ACK
+    SYN_RECEIVED --> ESTABLISHED : rcv ACK
+    ESTABLISHED --> CLOSE_WAIT : rcv FIN / send ACK
+    CLOSE_WAIT --> LAST_ACK : close()
+    LAST_ACK --> CLOSED : rcv ACK
+```
+
+#### Message Flow
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Server
+
+    %% Color legend
+    Note right of Client: 🟦 Client State
+    Note left of Server: 🟥 Server State
+
+    Note over Client,Server: 🔄 Connection Setup (3-Way Handshake)
+
+    activate Client
+    Client->>Server: SYN
+    Note right of Client: 🟦 SYN_SENT
+    Note left of Server: 🟥 LISTEN → SYN_RECEIVED
+
+    activate Server
+    Server->>Client: SYN + ACK
+    Note left of Server: 🟥 SYN_RECEIVED
+    Note right of Client: 🟦 SYN_SENT → ESTABLISHED
+
+    Client->>Server: ACK
+    Note right of Client: 🟦 ESTABLISHED
+    Note left of Server: 🟥 SYN_RECEIVED → ESTABLISHED
+
+    Note over Client,Server: 📡 Data exchange (both in ESTABLISHED)
+
+    Note over Client,Server: 🔚 Connection Termination
+
+    Client->>Server: FIN
+    Note right of Client: 🟦 ESTABLISHED → FIN_WAIT_1
+    Note left of Server: 🟥 ESTABLISHED → CLOSE_WAIT
+
+    Server->>Client: ACK
+    Note right of Client: 🟦 FIN_WAIT_1 → FIN_WAIT_2
+
+    Server->>Client: FIN
+    Note left of Server: 🟥 CLOSE_WAIT → LAST_ACK
+    Note right of Client: 🟦 FIN_WAIT_2 → TIME_WAIT
+
+    Client->>Server: ACK
+    Note right of Client: 🟦 TIME_WAIT
+    Note left of Server: 🟥 LAST_ACK → CLOSED
+
+    deactivate Server
+    deactivate Client
+
+    Note right of Client: 🟦 TIME_WAIT → CLOSED (after 2MSL)
+```
+
+- ### Buffers and Queues
+
   - #### Send Buffer
+
   - #### Receive Buffer
+
   - #### Out-of-Order Queue
+
 - ### Congestion Control and Flow Control
+
   Implementation includes algorithms for congestion control and flow control. These mechanisms adjust the rate of data transmission based on network conditions and receiver capabilities to optimize throughput and prevent congestion.
-- ### Timers
+
+- ### Timer
+
   Various timers used to manage retransmission, detect dead connections etc.
 
 ## TCP connection states
@@ -243,24 +379,39 @@ This table provides an overview of some of the options you can set with `setsock
 These states are part of the TCP finite state machine, which governs the lifecycle of a TCP connection from initiation through data transfer and finally to termination. Understanding these states is crucial for diagnosing network issues and for developing network applications.
 
 ## TCP connection open 3-way handshake
+
 - ### SYN SENT
+
   Client sends a TCP segment with the SYN buti set to 1. This segment also includes an initial sequence number chosen by the sender to start the sequence numbers of the segments it will send.
+
 - ### SYN-ACK Received
+
   The server receives the SYN request, responds with a TCP segment that has both the SYN and ACK bits set to 1. The ACK bit acknowledges the sender's SYN packet by including an acknowledgement number that is one more than the received initial sequence number. The receiver also sets it ISN.
+
 - ### ACK Sent
+
   The client receives the SYN-ACK packet and responds with a TCP segment where the ACK bit is set to 1. This acknowledgement packet includes and acknowledgement number that is one more that the received initial sequence number from the receiver.
 
 ## TCP connection close 4-way handshake
+
 - ### FIN from Client
+
   Client sends a TCP segment with FIN flag set to 1.
+
 - ### ACK from Server
+
   The server sends ACK.
+
 - ### FIN from Server
+
   The server sends FIN segment to client
+
 - ### Ack from Client
+
   THe client sends ACK to acknowledge the FIN.The client goes to TIME_WAIT state  ( usually a duration of 2*MSL - Maximum Segment Lifetime) to ensure all packets have been properly received and to avoid potential conflicts with the new connection.
 
 ## TCP header options
+
 Here's an expanded table that includes both the previously mentioned TCP options and some additional ones, capturing a broader range of TCP header options for enhanced functionalities and optimizations:
 
 | Option                         | Description                                                                                                                                                              | Use Case                                                                 |
@@ -281,6 +432,7 @@ Here's an expanded table that includes both the previously mentioned TCP options
 This table includes a range of TCP options designed to address various network conditions, performance optimization needs, and security requirements, showcasing the protocol's adaptability and evolution over time.
 
 ## Maximum Segment Size
+
 During connection establishment, the client and the server set the MSS option in their SYN packet.
 MSS is calculated as follows:
 MSS = Interface MTU - IP header size - TCP header size
@@ -288,91 +440,121 @@ MSS = Interface MTU - IP header size - TCP header size
     = 1460 bytes
 
 ### Path MTU Discovery
-  - **Don't Fragment (DF) bit**: The source sets the DF bit in the IP header of outgoing packets. This instructs routers not to fragment these packets.
-  - **Sending Initial Packets**: The source initially sends packets with MTU of its local interface.
-  - **Fragmentation Needed and DF set**: If any of the packets encounter a router with a smaller MTU on the path to the destination, the router drops the packet and sends back an ICMP "Fragmentation Needed and DF set" message to the source. This message includes the MTU of that link indicating the largest packet size it can forward.
-  - **Adjusting the MTU**: The source adjusts its packet size to match the reported MTU and retransmits the packet.
+
+- **Don't Fragment (DF) bit**: The source sets the DF bit in the IP header of outgoing packets. This instructs routers not to fragment these packets.
+- **Sending Initial Packets**: The source initially sends packets with MTU of its local interface.
+- **Fragmentation Needed and DF set**: If any of the packets encounter a router with a smaller MTU on the path to the destination, the router drops thepacket and sends back an ICMP "Fragmentation Needed and DF set" message to the source. This message includes the MTU of that link indicating thelargest packet size it can forward.
+- **Adjusting the MTU**: The source adjusts its packet size to match the reported MTU and retransmits the packet.
 For IPV6, ICMPv6 "Packet too big" message is generated.
 
 ## Timestamps
+
 The TCP timestamps option serves two primary purposes:
-  - RTT (Round Trip Time)
-  - PAWS (Protection against wrapped sequence numbers)
+
+- RTT (Round Trip Time)
+- PAWS (Protection against wrapped sequence numbers)
 It consists of two fields, each 4 bytes long:
-  - **TS Value (TSval)**: Contains the current value of the timestamp clock of the TCP sender.
-  - **TS Echo Reply (TSecr)**: Used to echo the most recent Timestamp value received from the remote TCP endpoint.
+- **TS Value (TSval)**: Contains the current value of the timestamp clock of the TCP sender.
+- **TS Echo Reply (TSecr)**: Used to echo the most recent Timestamp value received from the remote TCP endpoint.
 
-### Enabling Timestamps:
-  -  The use of the timestamps option is negotiated at the start of the TCP connection. Both TCP endpoints must indicate their support for the option in the SYN segments during the 3-way segment.
-  -  Once enabled, all TCP segments sent during the connection should include the Timestamps options
+### Enabling Timestamps
 
-### Round-Trip Time Measurement:
-  - **Timestamping packets:** When a TCP segment is sent, the sender includes its current timestamp in the TSval field.
-  - **Echoing Timestamps:** The receiver echoes this timestamp back to the sender in the TSecr field of its ACK packets.
-  - **Calculating RTT:** By comparing the echoed timestamp with its current timestamp, the sender can accurately calculate RTT.
+- The use of the timestamps option is negotiated at the start of the TCP connection. Both TCP endpoints must indicate their support for the option in the SYN segments during the 3-way segment.
+- Once enabled, all TCP segments sent during the connection should include the Timestamps options
 
-### Protection against Wrapped Sequence Numbers (PAWS):
-  - **Sequence Number Wraparound:** With high-speed networks, and long duration connections, there's a theoritical risk that TCP sequence numbers might wrap around.
-  - **Timestamps as a Solution:** The Timestamps option helps to distinguish between new and old segments that might have the same sequence numbers, by checking the timestamp values. A TCP segment is discarded if it has a sequence number that appears to be valid but carries an older timestamp than expected.
-  - **Timestamp Validation:** Each TCP segment's timestamp is compared against the last received timestamp to ensure that no out-of-date segments are accepted.
+### Round-Trip Time Measurement
+
+- **Timestamping packets:** When a TCP segment is sent, the sender includes its current timestamp in the TSval field.
+- **Echoing Timestamps:** The receiver echoes this timestamp back to the sender in the TSecr field of its ACK packets.
+- **Calculating RTT:** By comparing the echoed timestamp with its current timestamp, the sender can accurately calculate RTT.
+
+### Protection against Wrapped Sequence Numbers (PAWS)
+
+- **Sequence Number Wraparound:** With high-speed networks, and long duration connections, there's a theoritical risk that TCP sequence numbers mightwrap around.
+- **Timestamps as a Solution:** The Timestamps option helps to distinguish between new and old segments that might have the same sequence numbers, bychecking the timestamp values. A TCP segment is discarded if it has a sequence number that appears to be valid but carries an older timestamp thanexpected.
+- **Timestamp Validation:** Each TCP segment's timestamp is compared against the last received timestamp to ensure that no out-of-date segments are accepted.
 
 ## Window Scale
+
 The TCP window size field in the header specifies the amount of data in bytes that a sender can transmit before needing an acknowledgement from the reciever, effectively controlling the flow of data to prevent congestion. However, the original TCP specification limits this field to 16 bits, capping the maximum window size at 64KB, which can be insufficient for modern high-speed networks.
-  - **Purpose:** It extends the maximum window size beyond 65535 bytes by allowing both sender and receiver to negotiate a scale factor used to left-shift the window size value. The scale factor increases the effective range of the window size.
-  - **Negotiation During Connection Establishment:** Both the client and server must indicate their support for the the Window Scale option in the options field of their initial SYN and SYN-ACK packets.
-  - **Scale Factor:** The scale factor is a single byte in length, allowing a maximum shift of 14 bits. This means the maximum window size can be scaled up to 1GB (2^14 * 64KB).
-  - **Applications:** The Window Scale factor is applied to window size field in all subsequent TCP segments for the duration of the connection. The window size is only scaled in the direction it is sent. That is, the sender of the window scale option scales the window size it advertises to the receiver according to its own scale factor.
+
+- **Purpose:** It extends the maximum window size beyond 65535 bytes by allowing both sender and receiver to negotiate a scale factor used toleft-shift the window size value. The scale factor increases the effective range of the window size.
+- **Negotiation During Connection Establishment:** Both the client and server must indicate their support for the the Window Scale option in theoptions field of their initial SYN and SYN-ACK packets.
+- **Scale Factor:** The scale factor is a single byte in length, allowing a maximum shift of 14 bits. This means the maximum window size can be scaledup to 1GB (2^14 * 64KB).
+- **Applications:** The Window Scale factor is applied to window size field in all subsequent TCP segments for the duration of the connection. The window size is only scaled in the direction it is sent. That is, the sender of the window scale option scales the window size it advertises to the receiver according to its own scale factor.
 When the Window Scale option is negotiated at the start of a TCP connection, each TCP endpoint informs the other of the scale factor it wishes to apply to the receive window size it advertises. This means:
 When Host A sends a Window Scale option in its SYN packet, it's telling Host B, "This is the scale factor you should apply to the window size I advertise to you." In other words, Host A is determining how its inbound window size (for data it receives) is scaled.
 Conversely, when Host B responds with its own Window Scale option, it's specifying the scale factor that Host A should apply to the window size Host B advertises to Host A.
 
 ## Quick-Start
+
 The Quick-Start Request and Quick-Start Response options in TCP were proposed as a mechanism to allow TCP connections to quickly utilize available bandwidth in situations where the network is under-utilized. The traditional slow-start mechanism in TCP, designed to prevent congestion, can be sometimes too conservative. The Quick-Start process aims to address this by allowing a sender to request permission from routers along the path to send data at a higher initial rate.
 
 ### How Quick-Start Works
-  1.  #### Quick-Start Request:
-      In the TCP header or IP header of a packet, the sender includes a Quick-Start Request, specifying a desired transmission rate in terms of bytes per interval. This request is made during the initial stages of the connection or when the connection has been idle for a long period.
-  2. #### Router Processing:
-     - Each router along the path checks its current load. If it can accommodate the requested rate without causing congestion, it forwards the packet, possibly adjusting the rate in the Quick-Start Request to a lower value if necessary based on its current capacity.
-     - If any router cannot accommodate the request, it reduces the rate to what it can support or mars the Quick-Start Request as not approved.
-  3. #### Quick-Start Response:
-     - The receiver of the Quick-Start Request packet reads the rate approved by the network and sends a Quick-Start Response back to the sender, indicating the rate that the sender is allowed to use.
-  4. #### Sender's Adjustment:
+
+1. #### Quick-Start Request
+
+    In the TCP header or IP header of a packet, the sender includes a Quick-Start Request, specifying a desired transmission rate in terms of bytes per interval. This request is made during the initial stages of the connection or when the connection has been idle for a long period.
+
+2. #### Router Processing
+
+   - Each router along the path checks its current load. If it can accommodate the requested rate without causing congestion, it forwards the packet, possibly adjusting the rate in the Quick-Start Request to a lower value if necessary based on its current capacity.
+   - If any router cannot accommodate the request, it reduces the rate to what it can support or mars the Quick-Start Request as not approved.
+
+3. #### Quick-Start Response
+
+   - The receiver of the Quick-Start Request packet reads the rate approved by the network and sends a Quick-Start Response back to the sender, indicating the rate that the sender is allowed to use.
+
+4. #### Sender's Adjustment
+
      - Upon receiving the Quick-Start Response, the sender adjusts its sending rate according to the approved rate. This adjustment allows the sender to bypass the slow start phase, immediately increasing its transmission rate to the approved level, thereby improving the efficiency of data transfer.
-    
+
 ### Quick-Start as IP header option
+
 #### IP Options Field
+
 It is also implemented as an IP option in the IP header to negotiate a higher initial data rate.
+
 #### Format
+
 The Quick-Start option in the IP header contains information such as the Rate Request, the QS Nonce, and the TTL of the packet when the Quick-Start Request was generated.
+
 #### Router Processing
+
  As the IP packet with the Quick-Start option traverses the network, each router examines this option. If the router supports Quick-Start and has sufficient available bandwidth, it can approve or adjust the rate. If the router does not support Quick-Start or cannot accommodate the request, it can modify the option to indicate that the Quick-Start Request was not approved.
 
 ## TCP Authentication Option
-It provides a way to authenticate TCP segments, ensuring that they are sent by the actual endpoints of the TCP connection and not by the attackers.
-### Key Features and Principles of TCP-AO
--  **Message Authentication Code(MAC):** TCP-AO uses a MAC to authenticate TCP segments. The MAC is calculated over the TCP segment, including a pseudo-header and a shared secret key.
--  **Key Management:** TCP-AO does not specify the key management mechanism within the protocol itself, allowing for the flexibility in how keys are distributed, managed and refreshed.
--  **Replay Protection:**: TCP-AO includes mechanisms for replay protection, ensuring that captured packets cannot be resent by an attacker in an attempt to disrupt the connection or inject malicious data.
--  **Algorithm Agility:** TCP-AO is designed to be algorithmically agile, meaning it can support various MAC algorithms
 
-### How TCP-AO works:
+It provides a way to authenticate TCP segments, ensuring that they are sent by the actual endpoints of the TCP connection and not by the attackers.
+
+### Key Features and Principles of TCP-AO
+
+- **Message Authentication Code(MAC):** TCP-AO uses a MAC to authenticate TCP segments. The MAC is calculated over the TCP segment, including a pseudo-header and a shared secret key.
+- **Key Management:** TCP-AO does not specify the key management mechanism within the protocol itself, allowing for the flexibility in how keys are distributed, managed and refreshed.
+- **Replay Protection:**: TCP-AO includes mechanisms for replay protection, ensuring that captured packets cannot be resent by an attacker in an attempt to disrupt the connection or inject malicious data.
+- **Algorithm Agility:** TCP-AO is designed to be algorithmically agile, meaning it can support various MAC algorithms
+
+### How TCP-AO works
+
 - **Setup:** Both ends of a TCP connection agree on a secret key and MAC algorithm. This agreement can be achieved through manual configuration or through automated key management protocols.
 - **Segment Processing:** When a TCP segment is ready to be sent, the sender computes the MAC over the segment's content (including pseudo header and TCP-AO speficif fields) using the agreed-upon key. The resulting MAC is included in TCP-AO option of the segment.
 - **Verification:** Upon receiving a segment with the TCP-AO option, the receiver computes the expected MAC using the same algorithm and key, then compares it with the MAC value included in the segment. If the values match, the segment is considered authentic, if not it is discarded.
 - **Key Change and Replay Protection:** TCP-AO can employ techniques like sequence numbers or time-based counters to protect against replay attacks. Keys can be rotated periodically to maintain security.
 
-### Use Cases:
+### Use Cases
+
 - **BGP Sessions:** TCP-AO is particularly useful for securing BGP sessions between routers, where session hijacking or injection of incorrect routing information by attackers could have significant impacts on network routing.
 - **Data Centers and Critical Infrastructure:** Anywhere that TCP connections need protection from tampering, or session hijacking, especially where critical data is transmitted or system integrity is paramount.
 
 ## TCP Fast Open
+
 - **TCP Cookie:** A cryptographic token generated by the server and sent to the client during an initial TFO-enabled connection. This cookie is essentially a secure server-specific identifier that the client stores and presents in subsequent connection attempts to the same server.
 - **Initial Connection:** During the first connection to a TFO enabled server, the client may not have a valid cookie, so it proceeds with a standard TCP handshake. However, it indicates its support for TFO. In response, the server provides a TFO cookie to the client.
 - **Subsequent Connections:** When the client initiates subsequent connections to the server, it includes the server's TFO cookie within the SYN packet of the TCP handshake. This allows the server to validate the client's request quickly and permits the client to send data to the server in the initial SYN packet itself, without waiting for the handshake to complete.
--  **Server Response:** If the server recognizes and validates the TFO cookie, it can accept the data in teh SYN packet and proceed with its ACK and possible response data, all while completing the handshake. This effectively reduces the connection establishment process from requiring two RTTs (Handshake + data transmission) to just one RTT.
+- **Server Response:** If the server recognizes and validates the TFO cookie, it can accept the data in teh SYN packet and proceed with its ACK and possible response data, all while completing the handshake. This effectively reduces the connection establishment process from requiring two RTTs (Handshake + data transmission) to just one RTT.
 
-# IP header
+## IP header
+
 The IP (Internet Protocol) header is a crucial component of the data packets used for communication over networked devices. It contains various fields that provide instructions and information required for the routing and delivery of the packet from the source to the destination. Below is a table that explains the fields found in an IP header, particularly focusing on the IPv4 header for simplicity.
 
 | Field                 | Size (Bits) | Description                                                                                   |
@@ -395,6 +577,7 @@ The IP (Internet Protocol) header is a crucial component of the data packets use
 This table outlines the structure and purpose of each field within an IPv4 header, offering a fundamental understanding of how IP packets are constructed and managed across networks. IPv6 headers have a different structure and set of fields, designed to accommodate a larger address space and improve the efficiency of packet handling.
 
 ## IP header flags
+
 The IP header includes a field for flags, which is used to control or identify fragments of a datagram. These flags are part of the fragmentation and reassembly process, allowing a large datagram to be broken into smaller fragments for transmission over a network that cannot support the original datagram size. Upon reaching the destination, these fragments can be reassembled to form the original message. The flags field is 3 bits in length, and here's a breakdown of what each bit represents in a tabular form:
 
 | Bit  | Name                 | Description                                                                                    |
@@ -435,47 +618,71 @@ Understanding these flags is essential for troubleshooting network issues relate
 This table encompasses a range of IP header options, from those integral to the protocol's operation to those that are deprecated or used for specific, less common purposes. The actual implementation and support for these options can vary, and their usage can impact network performance, security, and compatibility.
 
 ## IP fragmentation
+
 The following fields of the IP header are used in fragmentation
-  - ### Total Length:
-    Specifies the total length of the IP datagram, including the header and the data.
-  - ### Identification:
-    All fragments of a packet carry the same Identification value, enabling the receiving end to group them together correctly.
-  - ### Flags:
-    -  **DF(Don't Fragment):** If set, the flag indicates that the packet should not be fragmented.
-    -  **MF(More Fragments):** This flag is set on all fragments except the last one.
-  - ### Fragment Offset:
-    This field indicates the position of the fragment's data within the original IP packet.It is 13 bits long. It contains a value that represents the offset, or position, of the fragment's data in the original IP packet. The offset is measured in units of 8 bytes (64 bits).
-    #### Example
-    If an IP packet is 4000 bytes long, and has to pass through a network with an MTU of 1500 bytes, excluding the header (assuming 20 bytes of IP header) each fragment can carry up to 1480 bytes of the original packet's data.
-      - The first fragment would have a Fragment Offset of 0.
-      - The second fragment would carry the next portion of the data. Its Fragment Offset would be 185 (1480/8), indicating that the data starts at byte 1480 of the original packet.
+
+- ### Total Length
+
+  Specifies the total length of the IP datagram, including the header and the data.
+
+- ### Identification
+
+  All fragments of a packet carry the same Identification value, enabling the receiving end to group them together correctly.
+
+- ### Flags
+  
+  - **DF(Don't Fragment):** If set, the flag indicates that the packet should not be fragmented.
+  - **MF(More Fragments):** This flag is set on all fragments except the last one.
+
+- ### Fragment Offset
+
+  This field indicates the position of the fragment's data within the original IP packet.It is 13 bits long. It contains a value that represents the offset, or position, of the fragment's data in the original IP packet. The offset is measured in units of 8 bytes (64 bits).
+
+  #### Example
+
+  If an IP packet is 4000 bytes long, and has to pass through a network with an MTU of 1500 bytes, excluding the header (assuming 20 bytes of IP header) each fragment can carry up to 1480 bytes of the original packet's data.
+
+  - The first fragment would have a Fragment Offset of 0.
+  - The second fragment would carry the next portion of the data. Its Fragment Offset would be 185 (1480/8), indicating that the data starts at byte 1480 of the original packet.
 
 ## IPv6 Address
+
 ### Length
+
 128 bits
+
 ### Representation
-IPv6 addresses are represented as eight groups of four hexadecimal digits, each group representing 16 bite. The groups are separated by *:*. 
+
+IPv6 addresses are represented as eight groups of four hexadecimal digits, each group representing 16 bite. The groups are separated by *:*.
 For example: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+
 ### Zero Compression
+
 IPv6 allows for the omission of leading zeroes within any 16-bit block and the replacement of one or more consecutive all-zero blocks with a double colon (::).
 However, the double colon can appear only once in an address to prevent ambiguity.
 For example: 2001:db8:85a3::8a2e:370:7334
 
 ### Types of IPv6 addresses
-#### Unicast Address
-Indentify a single interface. A packet sent to a unicast address is delivered to the interface identified by that address.
--  **Global Unicast Address (GUA):** Similar to public IPv4 addresses.
--  **Link-Local Unicast Address:** Used for communication within a single network segment. They are not routable beyond their local link and have a prefix of fe80::/10
--  **Unique Local Addresses(ULA):** Similar to IPv4's private range addresses, meant for local communication withing a site or between a limited set of sites, with a prefix fc00::/7
 
-#### Multicast Addresses: 
+#### Unicast Address
+
+Indentify a single interface. A packet sent to a unicast address is delivered to the interface identified by that address.
+
+- **Global Unicast Address (GUA):** Similar to public IPv4 addresses.
+- **Link-Local Unicast Address:** Used for communication within a single network segment. They are not routable beyond their local link and have a prefix of fe80::/10
+- **Unique Local Addresses(ULA):** Similar to IPv4's private range addresses, meant for local communication withing a site or between a limited set of sites, with a prefix fc00::/7
+
+#### Multicast Addresses
+
 Represent a group of interfaces, potentially on different nodes. A packet sent to a multicast address is delivered to all interfaces identified by that address.
 Identified by the prefixL ff00::/8
 
-#### Anycast Addresses:
+#### Anycast Addresses
+
 Assigned to multiple interfaces(usually on different nodes), but a packet sent to anycast address is delivered to nearest interface.
 
 ## IPv6 Header
+
 The IPv6 header format is designed to be simpler and more efficient than its IPv4 counterpart. Here's a summary of the IPv6 header fields in a tabular format:
 
 | Field                          | Size (Bits) | Description                                                                                                                                               |
@@ -491,13 +698,17 @@ The IPv6 header format is designed to be simpler and more efficient than its IPv
 
 Unlike the IPv4 header, the IPv6 header does not include fields for header checksum, fragment offset, or flags for fragmentation. Instead, IPv6 handles fragmentation in the sending host, and for options that need to be communicated, IPv6 utilizes extension headers that follow the initial header and are identified by the "Next Header" field. This streamlined approach aims to facilitate faster processing by routers and support the expansive addressing and routing capabilities required for the modern internet.
 
-# Linux Sockets
-## Packet Sockets
+## Linux Sockets
+
+### Packet Sockets
+
 **Packet Sockets**, provided by Linux kernel, are specifically designed for direct interaction with Layer 2 packets. Using the socket() system call with **AF_PACKET** as the socket family, an application can send and receive Ethernet frames directly.
 Example:
+
 ```c
 int sockfd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 ```
+
 - **AF_PACKET**: Specifies the address family used for packet sockets, allowing direct access to protocol layers.
 - **SOCK_RAW**: Indicates raw network protocol access.
 - **htons(ETH_P_ALL)**: Specifies that all protocols are received(Ethernet frames), making the socket protocol-agnostic and capable of receiving all Layer 2 packets.
@@ -557,7 +768,8 @@ int main() {
 }
 ```
 
-### Key Points:
+### Key Points
+
 - **Socket Creation:** `socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)` creates a raw socket that receives ICMP packets. `AF_INET` specifies the IPv4 protocol, `SOCK_RAW` allows raw network protocol access, and `IPPROTO_ICMP` specifies the ICMP protocol.
 
 - **Receive Packets:** `recvfrom()` is used to receive packets from the socket. The function fills the buffer with the received packet data and provides the source address.

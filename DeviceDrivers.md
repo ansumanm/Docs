@@ -446,3 +446,44 @@ flowchart TD
 | Runs at   | Many kernel hooks                        | Very early, at NIC driver level                    |
 | Used for  | Monitoring, filtering, tracing, performance tools | DDoS protection, load balancing, packet filtering |
 | Depends on| Kernel support, verifier                 | eBPF + compatible NIC driver                       |
+
+### Key Linux datastructures used
+
+| Step | Description                         | Key Data Structures |
+|------|-------------------------------------|---------------------|
+| 1    | NIC receives packet                 | `ring buffer`, `struct napi_struct` |
+| 2    | Interrupt / NAPI poll               | `softirq`, `struct net_device`, `struct napi_struct` |
+| 3    | Driver builds skb                   | `struct sk_buff` |
+| 4    | XDP/eBPF (optional)                 | `xdp_buff`, `bpf_prog`, `bpf_map` |
+| 5    | L2 processing                       | `struct ethhdr`, `struct vlan_hdr`, `sk_buff->protocol` |
+| 6    | Netfilter PREROUTING                | `struct nf_hook_ops`, `nf_conntrack`, `sk_buff` |
+| 7    | Routing decision                    | `struct rtable`, `fib_table`, `sk_buff->dst` |
+| 8    | Netfilter INPUT                     | Same as step 6 |
+| 9    | Transport layer (TCP/UDP)           | `struct sock`, `struct tcp_sock`, `struct inet_sock` |
+| 10   | Socket demux                        | `struct sock`, `struct hlist_head` (hash tables) |
+| 11   | User receives data                  | `sk->sk_receive_queue`, `copy_to_user()` |
+
+### Datastructures summary
+
+| Data Structure         | Summary                                                                 |
+|------------------------|-------------------------------------------------------------------------|
+| `ring buffer`          | Circular buffer in NIC driver used for DMA placement of incoming frames. |
+| `struct napi_struct`   | Represents a polling context for batching RX processing (used in NAPI). |
+| `softirq`              | Deferred interrupt handler for processing tasks like network packet RX. |
+| `struct net_device`    | Kernel abstraction of a network interface (e.g., eth0, enp1s0).          |
+| `struct sk_buff`       | Core packet structure used throughout the network stack.                |
+| `xdp_buff`             | Lightweight buffer used for early packet processing in XDP programs.    |
+| `bpf_prog`             | Compiled eBPF program attached to hooks like XDP or tracepoints.        |
+| `bpf_map`              | Key/value store accessible by eBPF programs (e.g., counters, flow state). |
+| `struct ethhdr`        | Ethernet header structure (MAC source, destination, and ethertype).     |
+| `struct vlan_hdr`      | VLAN tag header used in 802.1Q tagged Ethernet frames.                  |
+| `struct nf_hook_ops`   | Represents Netfilter hook registration (PREROUTING, INPUT, etc.).       |
+| `nf_conntrack`         | Tracks connection state for stateful firewall and NAT.                  |
+| `struct rtable`        | Routing entry used to determine the next hop and output interface.      |
+| `fib_table`            | Routing table used for longest-prefix match lookups.                    |
+| `struct sock`          | Kernel representation of a network socket (TCP, UDP, etc.).             |
+| `struct tcp_sock`      | TCP-specific socket structure containing TCP state info.                |
+| `struct inet_sock`     | IPv4-specific socket fields (IP addresses, ports, etc.).                |
+| `struct hlist_head`    | Hash list used for fast lookup of sockets and routing structures.       |
+| `sk->sk_receive_queue` | Queue of incoming `sk_buff`s waiting to be read by the user process.    |
+| `copy_to_user()`       | Kernel API for copying data to user-space buffers during syscalls.      |
