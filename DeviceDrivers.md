@@ -394,23 +394,23 @@ Inbound packet → user process (high‑level view)
 That’s the essential path: NIC → driver → softirq → L2 → netfilter → IP → transport → socket → user.
 
 ```mermaid
-graph TD
-    %% ---------- RX path: frame arrives ----------
-    A[NIC<br>DMA‑copies Ethernet frame] --> B[IRQ or NAPI poll]
-    B --> C[Driver builds<br><code>sk_buff</code>]
-    C --> D[XDP / eBPF fast‑path<br>(optional)]
-    D --> E[L2 processing<br>(Ethernet + VLAN strip)]
-    E --> F[Netfilter PREROUTING]
-    F --> G[Routing lookup]
+flowchart TD
+    A["NIC receives Ethernet frame"] --> B["Interrupt or NAPI poll"]
+    B --> C["Driver creates sk_buff"]
+    C --> D["XDP or eBPF processing (optional)"]
+    D --> E["L2 processing (Ethernet, VLAN)"]
+    E --> F["Netfilter PREROUTING"]
+    F --> G["Routing decision"]
 
-    %% ---------- Branch: LOCAL vs FORWARD ----------
-    G -->|Local host| H[Netfilter INPUT<br>(LOCAL_IN)]
-    H --> I[Transport layer<br>(TCP / UDP / ICMP)]
-    I --> J[Socket demux →<br>receive queue]
-    J --> K[User process<br><code>recv()/read()</code>]
+    %% Local delivery path
+    G -->|Local| H["Netfilter INPUT (LOCAL_IN)"]
+    H --> I["Transport layer (TCP/UDP/ICMP)"]
+    I --> J["Socket lookup and receive queue"]
+    J --> K["User process reads data"]
 
-    G -->|Forwarding| L[Netfilter FORWARD]
-    L --> M[Egress routing<br>select interface]
-    M --> N[Netfilter POSTROUTING]
-    N --> O[NIC TX queue<br>(frame sent)]
+    %% Forwarding path
+    G -->|Forward| L["Netfilter FORWARD"]
+    L --> M["Select egress interface"]
+    M --> N["Netfilter POSTROUTING"]
+    N --> O["NIC transmits packet"]
     ```
