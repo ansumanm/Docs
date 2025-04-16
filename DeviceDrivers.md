@@ -395,7 +395,7 @@ That’s the essential path: NIC → driver → softirq → L2 → netfilter →
 
 ```mermaid
 flowchart TD
-    A["NIC receives Ethernet frame"] --> B["Interrupt or NAPI poll"]
+    A["NIC receives Eth frame"] --> B["Interrupt or NAPI poll"]
     B --> C["Driver creates sk_buff"]
     C --> D["XDP or eBPF processing (optional)"]
     D --> E["L2 processing (Ethernet, VLAN)"]
@@ -413,4 +413,4 @@ flowchart TD
     L --> M["Select egress interface"]
     M --> N["Netfilter POSTROUTING"]
     N --> O["NIC transmits packet"]
-    ```
+```
