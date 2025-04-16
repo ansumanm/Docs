@@ -410,6 +410,39 @@ These states are part of the TCP finite state machine, which governs the lifecyc
 
   THe client sends ACK to acknowledge the FIN.The client goes to TIME_WAIT state  ( usually a duration of 2*MSL - Maximum Segment Lifetime) to ensure all packets have been properly received and to avoid potential conflicts with the new connection.
 
+## TCP Keepalive Mechanism
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Server
+
+    Note over Client,Server: 🔄 Initial Data Exchange
+
+    Client->>Server: [SEQ=1000, LEN=100]
+    Note right of Server: Received up to byte 1099
+
+    Server-->>Client: [ACK=1100]
+    Note left of Client: ACKs up to byte 1099
+
+    Client->>Server: [SEQ=1100, LEN=50]
+    Note right of Server: Received up to byte 1149
+
+    Server-->>Client: [ACK=1150]
+    Note left of Client: ACKs up to byte 1149
+
+    Note over Client,Server: ⏱️ Idle period begins...
+
+    Note over Client: After keepalive timeout (e.g. 300s)
+
+    Client->>Server: [SEQ=1149, ACK=1150, LEN=0] (Keepalive probe)
+    Note right of Server: Duplicate ACK range
+
+    Server-->>Client: [ACK=1150] (Keepalive response)
+
+    Note over Client: More keepalives will be sent periodically if no response
+```
+
 ## TCP header options
 
 Here's an expanded table that includes both the previously mentioned TCP options and some additional ones, capturing a broader range of TCP header options for enhanced functionalities and optimizations:
