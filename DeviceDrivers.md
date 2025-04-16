@@ -10,6 +10,7 @@
 9. [Linux device driver](#linux-device-driver)
 10. [Kernel Address space](#kernel-address-space)
 11. [ISR Context](#isr-context)
+12. [Frequently asked questions](#faqs)
    
 # System bootup process
   - **Power-on and Initial Startup:**
@@ -354,3 +355,62 @@ If identifies the source of the interrupt to dispatch the handling to the correc
 
 ### Dispatch to ISR
 Once the initial handling is complete, the system dispatches control to the specific ISR.
+
+## FAQs
+
+### What happens in between when the packet is received at the interface and it reaches the user-space application?
+
+Inbound packet → user process (high‑level view)
+	1.	NIC hardware receives the frame
+· The network‑interface card (NIC) sees an Ethernet frame on the wire and DMA‑copies it into its ring buffer in RAM.
+· A small header (descriptor) points to the buffer.
+	2.	Interrupt / NAPI poll
+· The driver either raises an interrupt or, under NAPI, is polled to pull several frames at once, reducing IRQ load.
+	3.	Driver builds an skb
+· The driver converts the raw buffer into a kernel sk_buff (skb) structure that the rest of the stack understands.
+	4.	Soft‑IRQ context (NET_RX)
+· The packet is queued to the NET_RX softirq.
+· Any registered XDP/eBPF program can accept, redirect, or drop the packet right here.
+	5.	L2 processing (Ethernet)
+· The Ethernet header is parsed; if the destination MAC matches the host (or a bridge/vlan), the skb is passed on.
+· VLAN or PPPoE tags are removed if present.
+	6.	Netfilter prerouting hook
+· nftables/iptables rules in the PREROUTING chain can mangle, accept, or drop the packet.
+	7.	IP layer
+· IP header is validated (checksum, length, TTL).
+· Routing lookup decides whether the packet is local or needs forwarding.
+· If local, skb enters the LOCAL_IN netfilter hook.
+	8.	Transport‑layer handler
+· Based on the IP protocol field, the packet is passed to TCP, UDP, ICMP, etc.
+· Example (TCP): sequence numbers checked, ACKs generated, data placed in the TCP receive queue.
+	9.	Socket demultiplex
+· The kernel matches the 4‑tuple (src/dst IP + port) to an open socket.
+· Data moves into the socket’s receive buffer (sk_rcvbuf).
+· If the buffer was empty, any thread blocked in poll/epoll/select or recv*() is woken up.
+	10.	System‑call copy to user space
+· The application calls read()/recvmsg(); copy_to_user() moves the payload from kernel memory into the process’s buffer.
+· The kernel returns control to user space; the application now owns the data.
+
+That’s the essential path: NIC → driver → softirq → L2 → netfilter → IP → transport → socket → user.
+
+```mermaid
+graph TD
+    %% ---------- RX path: frame arrives ----------
+    A[NIC<br>DMA‑copies Ethernet frame] --> B[IRQ or NAPI poll]
+    B --> C[Driver builds<br><code>sk_buff</code>]
+    C --> D[XDP / eBPF fast‑path<br>(optional)]
+    D --> E[L2 processing<br>(Ethernet + VLAN strip)]
+    E --> F[Netfilter PREROUTING]
+    F --> G[Routing lookup]
+
+    %% ---------- Branch: LOCAL vs FORWARD ----------
+    G -->|Local host| H[Netfilter INPUT<br>(LOCAL_IN)]
+    H --> I[Transport layer<br>(TCP / UDP / ICMP)]
+    I --> J[Socket demux →<br>receive queue]
+    J --> K[User process<br><code>recv()/read()</code>]
+
+    G -->|Forwarding| L[Netfilter FORWARD]
+    L --> M[Egress routing<br>select interface]
+    M --> N[Netfilter POSTROUTING]
+    N --> O[NIC TX queue<br>(frame sent)]
+    ```
