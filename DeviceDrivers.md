@@ -395,7 +395,7 @@ That’s the essential path: NIC → driver → softirq → L2 → netfilter →
 
 ```mermaid
 flowchart TD
-    A["NIC receives Eth frame"] --> B["Interrupt or NAPI poll"]
+    A["NIC receives Ethernet frame"] --> B["Interrupt or NAPI poll"]
     B --> C["Driver creates sk_buff"]
     C --> D["XDP or eBPF processing (optional)"]
     D --> E["L2 processing (Ethernet, VLAN)"]
@@ -414,3 +414,35 @@ flowchart TD
     M --> N["Netfilter POSTROUTING"]
     N --> O["NIC transmits packet"]
 ```
+
+### What is XDP/eBPF packet processing?
+
+⸻
+
+🔹 eBPF (Extended Berkeley Packet Filter)
+	•	A virtual machine in the Linux kernel that can run small, sandboxed programs.
+	•	These programs can be attached to networking hooks, tracepoints, and more.
+	•	eBPF lets you run logic in-kernel without changing kernel code.
+	•	Used for: packet filtering, monitoring, security, performance tuning.
+
+⸻
+
+🔹 XDP (Express Data Path)
+	•	A fast in-kernel packet processing layer based on eBPF.
+	•	Runs very early in the packet’s life — as soon as it arrives from the NIC.
+	•	Can:
+	•	Drop packets (like a firewall)
+	•	Redirect packets to other interfaces
+	•	Send packets to userspace
+	•	Much faster than traditional iptables or netfilter rules because it avoids most of the kernel stack.
+
+⸻
+
+🧠 In short:
+
+| Feature   | eBPF                                     | XDP                                               |
+|-----------|------------------------------------------|----------------------------------------------------|
+| Scope     | General in-kernel logic (networking, tracing, etc.) | High-performance packet processing                 |
+| Runs at   | Many kernel hooks                        | Very early, at NIC driver level                    |
+| Used for  | Monitoring, filtering, tracing, performance tools | DDoS protection, load balancing, packet filtering |
+| Depends on| Kernel support, verifier                 | eBPF + compatible NIC driver                       |
