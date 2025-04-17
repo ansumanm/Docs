@@ -812,3 +812,36 @@ int main() {
 - **Binding to an Interface:** The example above optionally includes code (commented out) to bind the socket to a specific IP address/interface. This step is not required but can be used if you want to receive ICMP packets on a specific interface.
 
 This example demonstrates the basics of receiving ICMP packets. In a real application, you would likely include additional error checking and possibly parse the ICMP message contents based on the ICMP packet structure.
+
+## The Way in which a packet gets lost in a network
+
+This is the result of routing anomalies.
+A router crashes or a link between 2 routers goes down and it takes the routing protocols , a seconds or minutes to stabilize and find an alternate path.
+
+During that time period a routing loop can occur ( router A sends packet to router B, and vice versa ) and packets can get caught in these loops.
+In the meantime assuming the lost packet is a TCP segment, the sending TCP times out and retransmits the packet, and the retransmitted packet gets to the final destination by some alternate path.
+
+But sometime later ( up to MSL seconds after the lost packet started on it journey ), the routing loop is corrected and the packet that was lost in the loop is sent to the final destination.
+
+This original packet is called "DUPLCIATE" or "WANDERING DUPLICATE". TCP must handle these duplicates.
+
+There are 2 reasons for the TIME_WAIT state :
+
+To implement TCP's full duplex connection termination reliably.
+To allow old duplicates segments to expire in the network.
+
+First reason can be explained by looking at the fig 2.5 and assuming that the final ACK is lost. Server will resend its final FIN , so the client must maintain state information, allowing it to resend the final Ack. If it did not maintain this information, it would respond with RST which would be interpreted by the server as an error.
+
+If a TCP is performing all the work necessary to terminate both directions of data flow cleanly for a connection ( its full duplex close ) , then it must correctly handle the loss of any of these 4 segments.  This example also shows why the active close end should wait in TIME_WAIT state : because that end is the one that might have to retransmit the final ACK
+
+Second Reason :
+Assume we have a TCP connection : 12.106.32.254:1500    and 206.168.112.219:21
+this connection is closed and sometime later , we establish another connection between the same IP and port.
+
+The latter connection is called incarnation of the previous connection since the IP address and ports are same.
+TCP must prevent old duplicates from a connection from reappearing at some later time and being misinterpreted as belonging to a new incarnation of the same connection.
+
+To do this,  TCP will not initiate a new incarnation of a connection that is currently in the TIME_WAIT state.
+Since the duration of the TIME_WAIT state is twice the MSL seconds for the reply to be lost.
+
+By enforcing this rule, we are guaranteed that when we successfully establish  a TCP connection, all old duplicates from previous incarnations of the connection have expired in the network
